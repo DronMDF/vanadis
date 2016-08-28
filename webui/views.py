@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-
+from django.shortcuts import render
 
 def index(request):
-	return HttpResponse("Hello, world. You're at the vanadis index.")
+	return render(request, 'ui/index.html', {})
