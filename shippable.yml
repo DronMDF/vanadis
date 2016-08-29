@@ -1,13 +1,10 @@
 linguage: python
 
 python:
-        - "3.2"
-        - "3.3"
-        - "3.4"
         - "3.5"
 
 install:
-        - pip install --use-mirrors Django
+        - pip3 install Django
 
 before_script:
         - ./manage.py migrate
