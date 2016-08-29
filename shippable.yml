@@ -1,13 +1,15 @@
-linguage: python
+language: python
 
 python:
-        - "3.5"
+  - "3.5"
 
 install:
-        - pip3 install Django
+  - python --version
+  - pip --version
+  - pip install Django
 
 before_script:
-        - ./manage.py migrate
+  - ./manage.py migrate
 
 script:
-        - ./manage.py test
+  - ./manage.py test
