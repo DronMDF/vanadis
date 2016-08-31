@@ -5,11 +5,10 @@ python:
 
 install:
   - pip install pep8
-  - pip install Django
-
-before_script:
-  - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191
-  - ./manage.py migrate
+  - pip install Django==1.10
+  - pip install unittest-xml-reporting
 
 script:
-  - ./manage.py test
+  - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191
+  - ./manage.py migrate
+  - ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
