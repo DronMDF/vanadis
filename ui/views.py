@@ -5,7 +5,9 @@ from base.models import Project
 
 
 def index(request):
-	return render(request, 'ui/index.html', {})
+	projects = Project.objects.all()
+	context = {'projects': projects}
+	return render(request, 'ui/index.html', context)
 
 
 class CreateProjectView(View):
