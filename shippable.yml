@@ -4,23 +4,21 @@ python:
   - "3.5"
 
 env:
-  - DATABASE=subsql
+  - DATABASE=sqlite
   - DATABASE=postgresql
 
 services:
   - postgres
 
-install:
-  - pip install Django==1.10
-  - pip install pep8
-  - pip install psycopg2
-  - pip install unittest-xml-reporting
-
-before_script:
-  - psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
-  - psql -c "create database vanadisdb;" -U postgres
-
-script:
-  - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191
-  - ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
-  - ./manage.py migrate
+build:
+  ci:
+    - pip install Django==1.10
+    - pip install pep8
+    - pip install psycopg2
+    - pip install unittest-xml-reporting
+    - psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
+    - psql -c "create database vanadisdb;" -U postgres
+    - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191
+    - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
+    - ./manage.py migrate
+    - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
