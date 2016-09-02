@@ -9,6 +9,7 @@ def index(request):
 	context = {'projects': projects}
 	return render(request, 'ui/index.html', context)
 
+
 def project(request, id):
 	project = get_object_or_404(Project, id=id)
 	context = {'project': project, 'revisions': [], 'branches': [], 'files': []}
