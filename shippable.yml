@@ -14,6 +14,7 @@ build:
   ci:
     - pip install Django==1.10
     - pip install pep8
+    - pip install --upgrade wheel
     - pip install psycopg2
     - pip install unittest-xml-reporting
     - psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
