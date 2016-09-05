@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
-	url(r'^createproject$', views.CreateProjectView.as_view()),
+	url(r'^project$', views.createProject),
 	url(r'^project/(?P<id>\d+)/$', views.project),
 ]
