@@ -39,24 +39,22 @@ class TestProject(TestCase):
 
 	def testProjectPageHoldProjectName(self):
 		# Given
-		project = Project.objects.create(name='named')
+		name = 'name-of-project'
+		Project.objects.create(name=name)
 		# When
-		response = Client().get('/ui/project/%u/' % project.id)
+		response = Client().get('/ui/project/%s/' % name)
 		# Then
 		self.assertEqual(response.status_code, 200)
-		self.assertIn('named', response.content.decode('utf-8'))
+		self.assertIn(name, response.content.decode('utf-8'))
 
 	def testProjectPageContainReportUploadForm(self):
 		# Given
-		project = Project.objects.create()
+		name = 'name-of-project'
+		Project.objects.create(name=name)
 		# When
-		response = Client().get('/ui/project/%u/' % project.id)
+		response = Client().get('/ui/project/%s/' % name)
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.content.decode('utf-8')
-		self.assertIn(
-			"<form action='/import/' method='post' enctype='multipart/form-data'>",
-			content)
-		self.assertIn(
-			"<input type='hidden' name='project' value='%s'>" % project.name,
-			content)
+		self.assertIn("<form action='/import/' method='post'", content)
+		self.assertIn("<input type='hidden' name='project' value='%s'>" % name, content)

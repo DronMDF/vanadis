@@ -14,8 +14,8 @@ def index(request):
 
 
 @require_GET
-def project(request, id):
-	project = get_object_or_404(Project, id=id)
+def project(request, name):
+	project = get_object_or_404(Project, name=name)
 	context = {'project': project, 'revisions': [], 'branches': [], 'files': []}
 	return render(request, 'ui/project.html', context)
 
