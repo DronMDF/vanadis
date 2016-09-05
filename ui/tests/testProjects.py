@@ -29,7 +29,9 @@ class TestProject(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.content.decode('utf-8')
-		self.assertIn("<form action='/import' method='post' enctype='multipart/form-data'>",
+		self.assertIn(
+			"<form action='/import' method='post' enctype='multipart/form-data'>",
 			content)
-		self.assertIn("<input type='hidden' name='project' value='%s'>" % project.name,
+		self.assertIn(
+			"<input type='hidden' name='project' value='%s'>" % project.name,
 			content)
