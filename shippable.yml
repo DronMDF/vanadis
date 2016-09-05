@@ -15,12 +15,9 @@ build:
     - pip install --upgrade pip
     - pip install Django==1.10
     - pip install pep8
-    - pip install --upgrade wheel
-    - pip install psycopg2
     - pip install unittest-xml-reporting
-    - psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
-    - psql -c "create database vanadisdb;" -U postgres
     - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191
+    - ./dbinit.sh
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
