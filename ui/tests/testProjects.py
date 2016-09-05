@@ -3,10 +3,35 @@ from base.models import Project
 
 
 class TestProject(TestCase):
-	def testProjectShouldBeCreateOverForm(self):
+	def testProjectShouldContainValidChars(self):
 		# When
+		response = Client().post('/ui/project', data={'name': '%letter'})
+		# Then
+		self.assertEqual(response.status_code, 400)
+
+	def testProjectNameShouldBeUnder100Chars(self):
+		# When
+		response = Client().post('/ui/project', data={'name': 'a' * 101})
+		# Then
+		self.assertEqual(response.status_code, 400)
+
+	def testProjectNameRejectIfDigitAtBegin(self):
+		# When
+		response = Client().post('/ui/project', data={'name': '007a'})
+		# Then
+		self.assertEqual(response.status_code, 400)
+
+	def testProjectLongValidNameAreAcepted(self):
+		# When
+		response = Client().post('/ui/project', data={'name': 'x' * 100})
+		# Then
+		self.assertEqual(response.status_code, 302)		# Ok
+
+	def testProjectShouldBeCreateOverForm(self):
+		# Given
 		Project.objects.all().delete()
-		response = Client().get('/ui/createproject', data={'name': 'test_project'})
+		# When
+		response = Client().post('/ui/project', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response.url, '/ui')

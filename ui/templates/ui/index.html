@@ -2,7 +2,8 @@
 <html>
 <body>
 <h1>Vanadis</h1>
-<form action='createproject'>
+<form action='project' method='POST'>
+	{% csrf_token %}
 	<input type='text' name='name'/>
 	<input type='submit' value='Create'/>
 </form>
