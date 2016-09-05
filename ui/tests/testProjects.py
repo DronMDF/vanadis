@@ -6,7 +6,7 @@ class TestProject(TestCase):
 	def testProjectShouldBeCreateOverForm(self):
 		# When
 		Project.objects.all().delete()
-		response = Client().post('/ui/project/', data={'name': 'test_project'})
+		response = Client().post('/ui/project', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response.url, '/ui')
