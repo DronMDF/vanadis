@@ -16,7 +16,7 @@ def index(request):
 @require_GET
 def project(request, name):
 	project = get_object_or_404(Project, name=name)
-	files = [i.file for i in Issue.objects.filter(project=project)]
+	files = sorted(set((i.file for i in Issue.objects.filter(project=project))))
 	context = {'project': project, 'revisions': [], 'branches': [], 'files': files}
 	return render(request, 'ui/project.html', context)
 
