@@ -1,5 +1,5 @@
 from django.test import Client, TestCase
-from base.models import Project
+from base.models import Issue, Project
 
 
 class TestProject(TestCase):
@@ -58,3 +58,15 @@ class TestProject(TestCase):
 		content = response.content.decode('utf-8')
 		self.assertIn("<form action='/import/' method='post'", content)
 		self.assertIn("<input type='hidden' name='project' value='%s'>" % name, content)
+
+	def testProjectPageContainListOfFiles(self):
+		# Given
+		project = Project.objects.create(name='flist')
+		Issue.objects.create(project=project, file='test1.c', line=0, position=0)
+		Issue.objects.create(project=project, file='xeh.h', line=0, position=0)
+		# When
+		response = Client().get('/ui/project/%s/' % project.name)
+		# Then
+		content = response.content.decode('utf-8')
+		self.assertIn('test1.c', content)
+		self.assertIn('xeh.h', content)
