@@ -11,5 +11,9 @@
 	<input type='submit' value='Upload'>
 </form>
 <p/>
+Files:<br/>
+{% for file in files %}
+{{file}}<br/>
+{% endfor %}
 </body>
 </html>

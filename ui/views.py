@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_POST
-from base.models import Project
+from base.models import Issue, Project
 
 
 @require_GET
@@ -16,7 +16,8 @@ def index(request):
 @require_GET
 def project(request, name):
 	project = get_object_or_404(Project, name=name)
-	context = {'project': project, 'revisions': [], 'branches': [], 'files': []}
+	files = sorted(set((i.file for i in Issue.objects.filter(project=project))))
+	context = {'project': project, 'revisions': [], 'branches': [], 'files': files}
 	return render(request, 'ui/project.html', context)
 
 
