@@ -8,7 +8,11 @@ from base.models import Issue, Project
 
 @require_GET
 def index(request):
-	projects = Project.objects.all()
+	projects = [{
+		'name': p.name,
+		'id': p.id,
+		'issue_count': len(Issue.objects.filter(project=p.id))
+	} for p in Project.objects.all()]
 	context = {'projects': projects}
 	return render(request, 'ui/index.html', context)
 
