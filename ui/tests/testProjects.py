@@ -70,3 +70,16 @@ class TestProject(TestCase):
 		content = response.content.decode('utf-8')
 		self.assertIn('test1.c', content)
 		self.assertIn('xeh.h', content)
+
+	def testProjectPageContainListOfFilesWithCountsOfIssue(self):
+		# Given
+		project = Project.objects.create(name='flist')
+		Issue.objects.create(project=project, file='test1.c', line=0, position=0)
+		Issue.objects.create(project=project, file='xeh.h', line=0, position=0)
+		Issue.objects.create(project=project, file='xeh.h', line=1, position=0)
+		# When
+		response = Client().get('/ui/project/%s/' % project.name)
+		# Then
+		content = response.content.decode('utf-8')
+		self.assertRegex(content, 'test1.c[^2]+1')
+		self.assertRegex(content, 'xeh.h[^1]+2')
