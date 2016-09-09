@@ -17,6 +17,10 @@ class IssueRepr:
 			other.code)
 		return sd == od
 
+	def asModel(self):
+		return Issue(project=self.project, file=self.file, line=self.line,
+			position=self.position, text=self.message, code=self.code)
+
 
 def splitReportToIssueChain(log):
 	issue_chain = []
