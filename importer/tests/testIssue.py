@@ -55,7 +55,6 @@ class TestFileRepr(TestCase):
 		self.assertEqual(f.path, 'path/conf.h')
 
 
-
 class TestIssueRepr(TestCase):
 	def testIssueReprEquality(self):
 		# Given
