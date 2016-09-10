@@ -28,6 +28,11 @@ def project(request, name):
 	return render(request, 'ui/project.html', context)
 
 
+@require_GET
+def file(request, projectname, filename):
+	print(projectname, filename)
+
+
 @require_POST
 @csrf_protect
 def createProject(request):

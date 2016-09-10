@@ -9,7 +9,7 @@
 </form>
 <p>Projects:</p>
 {% for project in projects %}
-	<a href='project/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
+	<a href='/ui/project/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
 {% endfor %}
 </body>
 </html>
