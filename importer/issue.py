@@ -1,5 +1,19 @@
+import os
 import re
 from base.models import Issue
+
+
+class FileRepr:
+	def __init__(self, path):
+		self.path = ''
+		self.update(path)
+
+	def update(self, path):
+		np = os.path.normpath(path)
+		if np.startswith('../'):
+			np = np.lstrip('./')
+		if len(self.path) < len(np):
+			self.path = np
 
 
 class IssueRepr:
@@ -12,17 +26,15 @@ class IssueRepr:
 		self.code = code.rstrip()
 
 	def __hash__(self):
-		return hash((self.file.split('/')[-1], self.line, self.position, self.message,
-			self.code))
+		return hash((self.file, self.line, self.position, self.message, self.code))
 
 	def __eq__(self, other):
-		sd = (self.file.split('/')[-1], self.line, self.position, self.message, self.code)
-		od = (other.file.split('/')[-1], other.line, other.position, other.message,
-			other.code)
+		sd = (self.file, self.line, self.position, self.message, self.code)
+		od = (other.file, other.line, other.position, other.message, other.code)
 		return sd == od
 
 	def asModel(self):
-		return Issue(project=self.project, file=self.file, line=self.line,
+		return Issue(project=self.project, file=self.file.path, line=self.line,
 			position=self.position, text=self.message, code=self.code)
 
 
@@ -38,12 +50,19 @@ def splitReportToIssueChain(log):
 
 
 def generateIssueRepr(log, project):
+	files = dict()
 	for il in splitReportToIssueChain(log):
 		if len(il) < 1:
 			continue
 		mo = re.match('^(.*):(\d+):(\d+): warning: (.*)$', il[0].decode('utf8'))
 		if mo and len(il) >= 2:
-			yield IssueRepr(project, mo.group(1), mo.group(2), mo.group(3),
+			filename = mo.group(1)
+			filekey = filename.split('/')[-1]
+			if filekey not in files:
+				files[filekey] = FileRepr(filename)
+			else:
+				files[filekey].update(filename)
+			yield IssueRepr(project, files[filekey], mo.group(2), mo.group(3),
 				mo.group(4), il[1])
 
 
