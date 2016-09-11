@@ -30,7 +30,14 @@ def project(request, name):
 
 @require_GET
 def file(request, projectname, filename):
-	print(projectname, filename)
+	project = get_object_or_404(Project, name=projectname)
+	issues = Issue.objects.filter(project=project, file=filename).order_by('line')
+	context = {
+		'project': project,
+		'file': {'name': filename},
+		'issues': issues,
+	}
+	return render(request, 'ui/file.html', context)
 
 
 @require_POST

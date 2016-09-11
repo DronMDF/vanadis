@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>{{project.name}}/{{file.name}}</h1>
+<p/>
+<font face='monospace'>
+{% for issue in issues %}
+<pre>{{issue.code}}</pre>
+<p style="text-indent: {{issue.position|add:"-1"}}ch">^ {{issue.text}}</p>
+{% endfor %}
+</font>
+</body>
+</html>
