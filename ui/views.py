@@ -28,6 +28,18 @@ def project(request, name):
 	return render(request, 'ui/project.html', context)
 
 
+@require_GET
+def file(request, projectname, filename):
+	project = get_object_or_404(Project, name=projectname)
+	issues = Issue.objects.filter(project=project, file=filename).order_by('line')
+	context = {
+		'project': project,
+		'file': {'name': filename},
+		'issues': issues,
+	}
+	return render(request, 'ui/file.html', context)
+
+
 @require_POST
 @csrf_protect
 def createProject(request):
