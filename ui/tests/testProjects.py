@@ -7,19 +7,19 @@ class TestProject(TestCase):
 		# When
 		response = Client().post('/ui/project', data={'name': '%letter'})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameShouldBeUnder100Chars(self):
 		# When
 		response = Client().post('/ui/project', data={'name': 'a' * 101})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameRejectIfDigitAtBegin(self):
 		# When
 		response = Client().post('/ui/project', data={'name': '007a'})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectLongValidNameAreAcepted(self):
 		# When
@@ -34,7 +34,7 @@ class TestProject(TestCase):
 		response = Client().post('/ui/project', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/ui')
+		self.assertEqual(response.url, '/ui/project/test_project')
 		Project.objects.get(name='test_project')		# Not raise
 
 	def testProjectPageHoldProjectName(self):

@@ -1,4 +1,4 @@
 from .MainView import MainView
-from .views import createProject
 from .ProjectView import ProjectView
+from .NewProjectView import NewProjectView
 from .FileView import FileView
