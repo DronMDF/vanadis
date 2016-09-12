@@ -13,6 +13,6 @@ class FileView(TemplateView):
 		project = get_object_or_404(Project, name=projectname)
 		context['project'] = project
 		context['filename'] = filename
-		context['issues'] = Issue.objects.filter(project=project, file=filename) \
-				.order_by('line')
+		context['issues'] = Issue.objects.filter(project=project,
+				file=filename).order_by('line')
 		return context
