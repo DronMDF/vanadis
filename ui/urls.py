@@ -1,9 +1,9 @@
 from django.conf.urls import url
-from . import views
+from .views import *
 
 urlpatterns = [
-	url(r'^$', views.index, name='index'),
-	url(r'^project$', views.createProject),
-	url(r'^project/(?P<name>[\w-]+)/$', views.project),
-	url(r'^project/(?P<projectname>[\w-]+)/(?P<filename>.*)$', views.file),
+	url(r'^$', MainView.as_view(), name='index'),
+	url(r'^project$', createProject),
+	url(r'^project/(?P<name>[\w-]+)/$', ProjectView.as_view()),
+	url(r'^project/(?P<projectname>[\w-]+)/(?P<filename>.*)$', FileView.as_view()),
 ]
