@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<body>
+<form action="/ui/project/{{projectname}}/import" method="post">
+    {% csrf_token %}
+    {{ form }}<br/>
+    <input type="submit" value="Upload" />
+</form>
+</body>
+</html>

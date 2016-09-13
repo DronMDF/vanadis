@@ -47,7 +47,7 @@ class TestProject(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertIn(name, response.content.decode('utf-8'))
 
-	def testProjectPageContainReportUploadForm(self):
+	def testProjectPageContainReportUploadUrl(self):
 		# Given
 		name = 'name-of-project'
 		Project.objects.create(name=name)
@@ -56,8 +56,7 @@ class TestProject(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.content.decode('utf-8')
-		self.assertIn("<form action='/import/' method='post'", content)
-		self.assertIn("<input type='hidden' name='project' value='%s'>" % name, content)
+		self.assertIn('/ui/project/%s/import' % name, response.content.decode('utf-8'))
 
 	def testProjectPageContainListOfFiles(self):
 		# Given
