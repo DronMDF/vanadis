@@ -2,11 +2,8 @@
 <html>
 <body>
 <h1>Vanadis</h1>
-<form action='project' method='POST'>
-	{% csrf_token %}
-	<input type='text' name='name'/>
-	<input type='submit' value='Create'/>
-</form>
+<p>
+<a href='/ui/project'>Create new project</a>
 <p>Projects:</p>
 {% for project in projects %}
 	<a href='/ui/project/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
