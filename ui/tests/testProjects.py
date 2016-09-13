@@ -7,19 +7,19 @@ class TestProject(TestCase):
 		# When
 		response = Client().post('/ui/project', data={'name': '%letter'})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameShouldBeUnder100Chars(self):
 		# When
 		response = Client().post('/ui/project', data={'name': 'a' * 101})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameRejectIfDigitAtBegin(self):
 		# When
 		response = Client().post('/ui/project', data={'name': '007a'})
 		# Then
-		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response.status_code, 200)
 
 	def testProjectLongValidNameAreAcepted(self):
 		# When
@@ -34,7 +34,7 @@ class TestProject(TestCase):
 		response = Client().post('/ui/project', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/ui')
+		self.assertEqual(response.url, '/ui/project/test_project')
 		Project.objects.get(name='test_project')		# Not raise
 
 	def testProjectPageHoldProjectName(self):
@@ -47,7 +47,7 @@ class TestProject(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertIn(name, response.content.decode('utf-8'))
 
-	def testProjectPageContainReportUploadForm(self):
+	def testProjectPageContainReportUploadUrl(self):
 		# Given
 		name = 'name-of-project'
 		Project.objects.create(name=name)
@@ -56,8 +56,7 @@ class TestProject(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.content.decode('utf-8')
-		self.assertIn("<form action='/import/' method='post'", content)
-		self.assertIn("<input type='hidden' name='project' value='%s'>" % name, content)
+		self.assertIn('/ui/project/%s/import' % name, response.content.decode('utf-8'))
 
 	def testProjectPageContainListOfFiles(self):
 		# Given

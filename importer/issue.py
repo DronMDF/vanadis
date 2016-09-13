@@ -1,6 +1,7 @@
 import os
 import re
-from base.models import Issue
+from django.shortcuts import get_object_or_404
+from base.models import Issue, Project
 
 
 class FileRepr:
@@ -69,3 +70,8 @@ def generateIssueRepr(log, project):
 def generateIssues(log, project):
 	for ir in set(generateIssueRepr(log, project)):
 		yield ir.asModel()
+
+
+def uploadReport(projectname, report):
+	project = get_object_or_404(Project, name=projectname)
+	Issue.objects.bulk_create(generateIssues(report, project))
