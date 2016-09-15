@@ -4,9 +4,11 @@
 <h1>{{project.name}}/{{file.name}}</h1>
 <p/>
 <font face='monospace'>
-{% for issue in issues %}
-<pre>{{issue.code}}</pre>
+{% for line in sourcecode %}
+<pre>{{line.code}}</pre>
+{% for issue in line.issues %}
 <p style="text-indent: {{issue.position|add:"-1"}}ch">^ {{issue.text}}</p>
+{% endfor %}
 {% endfor %}
 </font>
 </body>
