@@ -66,12 +66,13 @@ class TestIssueRepr(TestCase):
 
 	def testIssueReprConvertToModel(self):
 		# Given
+		p = Project.objects.create(name='test')
 		f = FileRepr('./conf.h')
-		i = IssueRepr(None, f, 35, 44, 'Problem', 'nil')
+		i = IssueRepr(p, f, 35, 44, 'Problem', 'nil')
 		# When
 		m = i.asModel()
 		# Then
-		self.assertEqual(m.file, f.path)
+		self.assertEqual(m.file.path, f.path)
 		self.assertEqual(m.line, i.line)
 		self.assertEqual(m.position, i.position)
 		self.assertEqual(m.text, i.message)

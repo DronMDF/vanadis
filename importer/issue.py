@@ -1,12 +1,13 @@
 import os
 import re
 from django.shortcuts import get_object_or_404
-from base.models import Issue, Project
+from base.models import File, Issue, Project
 
 
 class FileRepr:
 	def __init__(self, path):
 		self.path = ''
+		self.model = None
 		self.update(path)
 
 	def update(self, path):
@@ -15,6 +16,11 @@ class FileRepr:
 			np = np.lstrip('./')
 		if len(self.path) < len(np):
 			self.path = np
+
+	def asModel(self, project):
+		if self.model is None:
+			self.model = File.objects.get_or_create(project=project, path=self.path)[0]
+		return self.model
 
 
 class IssueRepr:
@@ -35,8 +41,8 @@ class IssueRepr:
 		return sd == od
 
 	def asModel(self):
-		return Issue(project=self.project, file=self.file.path, line=self.line,
-			position=self.position, text=self.message, code=self.code)
+		return Issue(project=self.project, file=self.file.asModel(self.project),
+			line=self.line, position=self.position, text=self.message, code=self.code)
 
 
 def splitReportToIssueChain(log):

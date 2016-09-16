@@ -16,7 +16,7 @@ class TestClangImport(TestCase):
 		response = Client().post('/ui/project/%s/import' % name, data={'report': log})
 		# Then
 		issue = Issue.objects.get(project__name=name)
-		self.assertEqual(issue.file, 'pid_output.c')
+		self.assertEqual(issue.file.path, 'pid_output.c')
 		self.assertEqual(issue.line, 101)
 		self.assertEqual(issue.position, 30)
 		self.assertEqual(issue.text, 'implicit conversion')
