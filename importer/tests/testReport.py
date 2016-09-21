@@ -52,8 +52,9 @@ class TestReportPerformance(TestCase):
 		def rs(size, extra_chars=''):
 			charset = string.ascii_letters + string.digits + extra_chars
 			return ''.join(random.choice(charset) for _ in range(size))
+
 		def rl():
-			return '%s:%u:%u: warning: %s\n%s' % (rs(30, '/'), random.randint(1,10000),
+			return '%s:%u:%u: warning: %s\n%s' % (rs(30, '/'), random.randint(1, 10000),
 				random.randint(1, 300), rs(80, ' '), rs(300, string.punctuation))
 		return '\n'.join(rl() for _ in range(1000))
 
