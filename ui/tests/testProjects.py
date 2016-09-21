@@ -1,5 +1,5 @@
 from django.test import Client, TestCase
-from base.models import Issue, Project
+from base.models import File, Issue, Project
 
 
 class TestProject(TestCase):
@@ -61,8 +61,10 @@ class TestProject(TestCase):
 	def testProjectPageContainListOfFiles(self):
 		# Given
 		project = Project.objects.create(name='flist')
-		Issue.objects.create(project=project, file='test1.c', line=0, position=0)
-		Issue.objects.create(project=project, file='xeh.h', line=0, position=0)
+		test1 = File.objects.create(project=project, path='test1.c')
+		xen = File.objects.create(project=project, path='xeh.h')
+		Issue.objects.create(project=project, file=test1, line=0, position=0)
+		Issue.objects.create(project=project, file=xen, line=0, position=0)
 		# When
 		response = Client().get('/ui/project/%s/' % project.name)
 		# Then
@@ -73,9 +75,11 @@ class TestProject(TestCase):
 	def testProjectPageContainListOfFilesWithCountsOfIssue(self):
 		# Given
 		project = Project.objects.create(name='flist')
-		Issue.objects.create(project=project, file='test1.c', line=0, position=0)
-		Issue.objects.create(project=project, file='xeh.h', line=0, position=0)
-		Issue.objects.create(project=project, file='xeh.h', line=1, position=0)
+		test1 = File.objects.create(project=project, path='test1.c')
+		xen = File.objects.create(project=project, path='xeh.h')
+		Issue.objects.create(project=project, file=test1, line=0, position=0)
+		Issue.objects.create(project=project, file=xen, line=0, position=0)
+		Issue.objects.create(project=project, file=xen, line=1, position=0)
 		# When
 		response = Client().get('/ui/project/%s/' % project.name)
 		# Then

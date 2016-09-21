@@ -1,5 +1,5 @@
 from django.test import Client, TestCase
-from base.models import Issue, Project
+from base.models import File, Issue, Project
 
 
 class TestFileView(TestCase):
@@ -7,9 +7,10 @@ class TestFileView(TestCase):
 		# Given
 		Project.objects.all().delete()
 		p = Project.objects.create(name='ff')
-		Issue.objects.create(project=p, file='xxx', code='aaa',
+		xxx = File.objects.create(project=p, path='xxx')
+		Issue.objects.create(project=p, file=xxx, code='aaa',
 				line=7, position=5, text='All bad')
-		Issue.objects.create(project=p, file='xxx', code='aaa',
+		Issue.objects.create(project=p, file=xxx, code='aaa',
 				line=7, position=10, text='End bad')
 		# When
 		response = Client().get('/ui/project/ff/xxx')

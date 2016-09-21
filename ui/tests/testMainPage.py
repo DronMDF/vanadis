@@ -1,5 +1,5 @@
 from django.test import Client, TestCase
-from base.models import Issue, Project
+from base.models import File, Issue, Project
 
 
 class TestMainPage(TestCase):
@@ -28,9 +28,11 @@ class TestMainPage(TestCase):
 		Project.objects.all().delete()
 		tp1 = Project.objects.create(name='test1')
 		tp2 = Project.objects.create(name='test2')
-		Issue.objects.create(project=tp1, line=0, position=0)
-		Issue.objects.create(project=tp1, line=0, position=0)
-		Issue.objects.create(project=tp2, line=0, position=0)
+		file1 = File.objects.create(project=tp1, path='tp1')
+		file2 = File.objects.create(project=tp2, path='tp2')
+		Issue.objects.create(project=tp1, file=file1, line=0, position=0)
+		Issue.objects.create(project=tp1, file=file1, line=0, position=0)
+		Issue.objects.create(project=tp2, file=file2, line=0, position=0)
 		# When
 		response = Client().get('/ui/')
 		# Then

@@ -24,10 +24,10 @@ class FileView(TemplateView):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
 		filename = kwargs['filename']
-		project = get_object_or_404(Project, name=projectname)
-		issues = Issue.objects.filter(project=project, file=filename).order_by('line')
+		issues = Issue.objects.filter(project__name=projectname,
+			file__path=filename).order_by('line')
 		lines = groupby(issues, lambda i: i.line)
-		context['project'] = project
+		context['projectname'] = projectname
 		context['filename'] = filename
 		context['sourcecode'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
 		return context
