@@ -5,10 +5,6 @@ class ReportStorage:
 	def __init__(self, project):
 		self.project = project
 
-	def issueInList(self, issue, issues):
-		return (issue.file, issue.line, issue.position, issue.text, issue.code) in [
-			(i.file, i.line, i.position, i.text, i.code) for i in issues]
-
 	def pathMatch(self, p, ef):
 		for ee in ef:
 			if ee == p or ee.endswith('/' + p) or p.endswith('/' + ee):
@@ -38,15 +34,15 @@ class ReportStorage:
 		files = {f.path: f for f in File.objects.filter(project=self.project)}
 		filemap = dict(self.pathMatchMap(report.files(), files.keys()))
 
-		issues = list(Issue.objects.filter(project=self.project))
+		issues = [(i.file.path, i.line, i.position, i.text, i.code)
+				for i in Issue.objects.filter(project=self.project)]
 		newissues = list()
 		for ni in report.issues():
-			if filemap[ni.file] is not None:
-				filename = filemap[ni.file]
-			else:
-				filename = ni.file
-			ii = Issue(project=self.project, file=files[filename], line=ni.line,
-				position=ni.position, text=ni.message, code=ni.code)
-			if not self.issueInList(ii, issues) and not self.issueInList(ii, newissues):
+			filename = filemap[ni.file]
+			if (filename, ni.line, ni.position, ni.message, ni.code) not in issues:
+				issues.append((filename, ni.line, ni.position, ni.message, ni.code))
+				ii = Issue(project=self.project, file=files[filename],
+					line=ni.line, position=ni.position, text=ni.message,
+					code=ni.code)
 				newissues.append(ii)
 		Issue.objects.bulk_create(newissues)
