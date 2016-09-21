@@ -89,7 +89,7 @@ class TestReportStoragePerformance(TestCase):
 
 	def tearDown(self):
 		delta = time.time() - self.start_time
-		self.assertLess(delta, 3)
+		self.assertLess(delta, 5)
 
 	def testKiloIssuesParsing(self):
 		# Given
