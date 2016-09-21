@@ -1,3 +1,6 @@
+import string
+import random
+import time
 from django.test import TestCase
 from importer.Report import Report
 
@@ -42,3 +45,29 @@ class TestReport(TestCase):
 		self.assertIn('dir/pid_output.c', files)
 		self.assertIn('in/pid_output.c', files)
 		self.assertIn('pid_output.c', files)
+
+
+class TestReportPerformance(TestCase):
+	def generateKiloReport(self):
+		def rs(size, extra_chars=''):
+			charset = string.ascii_letters + string.digits + extra_chars
+			return ''.join(random.choice(charset) for _ in range(size))
+		def rl():
+			return '%s:%u:%u: warning: %s\n%s' % (rs(30, '/'), random.randint(1,10000),
+				random.randint(1, 300), rs(80, ' '), rs(300, string.punctuation))
+		return '\n'.join(rl() for _ in range(1000))
+
+	def setUp(self):
+		self.report_text = self.generateKiloReport()
+		self.start_time = time.time()
+
+	def tearDown(self):
+		delta = time.time() - self.start_time
+		self.assertLess(delta, 0.02)
+
+	def testKiloIssuesParsing(self):
+		# When
+		report = Report(self.report_text)
+		# Then
+		self.assertGreater(len(list(report.files())), 0)
+		self.assertGreater(len(list(report.issues())), 0)

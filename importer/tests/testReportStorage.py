@@ -1,3 +1,6 @@
+import random
+import string
+import time
 from django.test import TestCase
 from base.models import File, Issue, Project
 from importer.Report import Report
@@ -67,3 +70,31 @@ class TestReportStorage(TestCase):
 		storage.importReport(report)
 		# Then
 		self.assertEqual(File.objects.get(pk=file.pk).path, 'path/to/file')
+
+
+class TestReportStoragePerformance(TestCase):
+	def generateKiloReport(self):
+		def rs(size, extra_chars=''):
+			charset = string.ascii_letters + string.digits + extra_chars
+			return ''.join(random.choice(charset) for _ in range(size))
+		def rl():
+			return '%s:%u:%u: warning: %s\n%s' % (rs(30, '/'), random.randint(1,10000),
+				random.randint(1, 300), rs(80, ' '), rs(300, string.punctuation))
+		return '\n'.join(rl() for _ in range(1000))
+
+	def setUp(self):
+		self.report = Report(self.generateKiloReport())
+		self.start_time = time.time()
+
+	def tearDown(self):
+		delta = time.time() - self.start_time
+		self.assertLess(delta, 3)
+
+	def testKiloIssuesParsing(self):
+		# Given
+		project = Project.objects.create(name='test')
+		storage = ReportStorage(project)
+		# When
+		storage.importReport(self.report)
+		# Then
+		self.assertEqual(Issue.objects.filter(project=project).count(), 1000)
