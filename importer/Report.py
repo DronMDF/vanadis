@@ -27,10 +27,17 @@ class Report:
 	def __init__(self, report_text):
 		self.report = set(self.generateIssues(report_text))
 
+	def isIssuePattern(self, l):
+		if re.match('^.*:\d+:\d+: warning: .*$', l):
+			return True
+		if re.match('^\[.*:\d+\].*: \((error|warning|performance|style).*$', l):
+			return True
+		return False
+
 	def splitReportToIssueChain(self, log):
 		issue_chain = []
 		for ll in log.split('\n'):
-			if re.match('^.*:\d+:\d+: warning: .*$', ll):
+			if self.isIssuePattern(ll):
 				if issue_chain:
 					yield issue_chain
 				issue_chain = []
@@ -44,9 +51,12 @@ class Report:
 				continue
 			mo = re.match('^(.*):(\d+):(\d+): warning: (.*)$', il[0])
 			if mo and len(il) >= 2:
-				filename = mo.group(1)
 				yield Issue(mo.group(1), int(mo.group(2)), int(mo.group(3)),
 					mo.group(4), il[1])
+				continue
+			m2 = re.match('^\[(.*?):(\d+)\].*: \((error|warning|performance|style)\) (.*)$', il[0])
+			if m2:
+				yield Issue(m2.group(1), int(m2.group(2)), 0, m2.group(4), '')
 
 	def files(self):
 		files = set()

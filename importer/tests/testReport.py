@@ -46,6 +46,76 @@ class TestReport(TestCase):
 		self.assertIn('in/pid_output.c', files)
 		self.assertIn('pid_output.c', files)
 
+	def testParseCppcheckWarning(self):
+		# Given
+		report = Report(("[bgpd/bgp_aspath.c:1867] -> [bgpd/bgp_aspath.c:1865]:"
+			" (warning) Either the condition 'seg2' is redundant or there"
+			" is possible null pointer dereference: seg2."))
+		# When
+		files = list(report.files())
+		issues = list(report.issues())
+		# Then
+		self.assertListEqual(files, ['bgpd/bgp_aspath.c'])
+		self.assertEqual(len(issues), 1)
+		self.assertEqual(issues[0].file, 'bgpd/bgp_aspath.c')
+		self.assertEqual(issues[0].line, 1867)
+		self.assertEqual(issues[0].message, ("Either the condition 'seg2' "
+			"is redundant or there is possible null pointer dereference: seg2."))
+
+	def testParseCppcheckStyle(self):
+		# Given
+		report = Report(("[bgpd/bgp_aspath.c:147]: (style) "
+			"The scope of the variable 'prev' can be reduced."))
+		# When
+		files = list(report.files())
+		issues = list(report.issues())
+		# Then
+		self.assertListEqual(files, ['bgpd/bgp_aspath.c'])
+		self.assertEqual(len(issues), 1)
+		self.assertEqual(issues[0].file, 'bgpd/bgp_aspath.c')
+		self.assertEqual(issues[0].line, 147)
+		self.assertEqual(issues[0].message,
+			"The scope of the variable 'prev' can be reduced.")
+
+	def testParseCppcheckError(self):
+		# Given
+		report = Report(("[bgpd/bgp_route.c:358]: "
+			"(error) Uninitialized struct member: newattr.extra"))
+		# When
+		files = list(report.files())
+		issues = list(report.issues())
+		# Then
+		self.assertListEqual(files, ['bgpd/bgp_route.c'])
+		self.assertEqual(len(issues), 1)
+		self.assertEqual(issues[0].file, 'bgpd/bgp_route.c')
+		self.assertEqual(issues[0].line, 358)
+		self.assertEqual(issues[0].message,
+			"Uninitialized struct member: newattr.extra")
+
+	def testParseCppcheckPerformance(self):
+		# Given
+		report = Report(("[ripngd/ripngd.c:2101] -> [ripngd/ripngd.c:2108]: "
+			"(performance) Variable 'len' is reassigned a value "
+			"before the old one has been used."))
+		# When
+		files = list(report.files())
+		issues = list(report.issues())
+		# Then
+		self.assertListEqual(files, ['ripngd/ripngd.c'])
+		self.assertEqual(len(issues), 1)
+		self.assertEqual(issues[0].file, 'ripngd/ripngd.c')
+		self.assertEqual(issues[0].line, 2101)
+		self.assertEqual(issues[0].message,
+			"Variable 'len' is reassigned a value before the old one has been used.")
+
+	def testParseCppcheckInformationIsNotIssue(self):
+		# Given
+		report = Report(("[./bgpd/bgp_main.c:1]: (information) "
+			"Skipping configuration 'QUAGGA_GROUP;QUAGGA_USER'"))
+		# Then
+		self.assertListEqual(list(report.files()), [])
+		self.assertListEqual(list(report.issues()), [])
+
 
 class TestReportPerformance(TestCase):
 	def generateKiloReport(self):
