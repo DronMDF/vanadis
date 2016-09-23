@@ -42,11 +42,9 @@ class TestReport(TestCase):
 			'    else if (ftruncate(fd, pidsize) < 0)'])
 		report = Report(io.StringIO(report_text))
 		# When
-		files = list(report.files())
+		files = set(report.files())
 		# Then
-		self.assertIn('dir/pid_output.c', files)
-		self.assertIn('in/pid_output.c', files)
-		self.assertIn('pid_output.c', files)
+		self.assertSetEqual(files, {'dir/pid_output.c', 'in/pid_output.c'})
 
 	def testParseCppcheckWarning(self):
 		# Given
@@ -141,7 +139,7 @@ class TestReportPerformance(TestCase):
 
 	def tearDown(self):
 		delta = time.time() - self.start_time
-		self.assertLess(delta, 0.05)
+		self.assertLess(delta, 0.5)
 
 	def testKiloIssuesParsing(self):
 		# When

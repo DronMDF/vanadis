@@ -18,53 +18,58 @@ class Issue:
 		return hash((self.file, self.line, self.position, self.message, self.code))
 
 	def __eq__(self, other):
-		sd = (self.file, self.line, self.position, self.message, self.code)
-		od = (other.file, other.line, other.position, other.message, other.code)
-		return sd == od
+		if self.line != other.line:
+			return False
+		if self.position != other.position:
+			return False
+		if self.file != other.file:
+			return False
+		if self.message != other.message:
+			return False
+		if self.code != other.code:
+			return False
+		return True
+
+
+class IssueStream:
+	def __init__(self, stream):
+		self.stream = stream
+
+	def __iter__(self):
+		return self
+
+	def __next__(self):
+		for rl in self.stream:
+			m1 = re.match('^(.*):(\d+):(\d+): warning: (.*)$', rl)
+			if m1:
+				return Issue(m1.group(1), int(m1.group(2)), int(m1.group(3)),
+					m1.group(4), next(self.stream).rstrip())
+			m2 = re.match(('^\[(.*?):(\d+)\].*: '
+				'\((error|warning|performance|style)\) (.*)$'), rl)
+			if m2:
+				return Issue(m2.group(1), int(m2.group(2)), 0, m2.group(4), '')
+		raise StopIteration
 
 
 class Report:
-	def __init__(self, report_stream):
-		self.report = set(self.generateIssues(''.join(report_stream.readlines())))
+	def __init__(self, stream):
+		issues = list(IssueStream(stream))
+		filemap = self.generateFileMap((i.file for i in issues))
+		self._files = set(filemap.values())
+		self._issues = set()
+		for i in issues:
+			i.file = filemap[i.file]
+			self._issues.add(i)
 
-	def isIssuePattern(self, l):
-		if re.match('^.*:\d+:\d+: warning: .*$', l):
-			return True
-		if re.match('^\[.*:\d+\].*: \((error|warning|performance|style).*$', l):
-			return True
-		return False
-
-	def splitReportToIssueChain(self, log):
-		issue_chain = []
-		for ll in log.split('\n'):
-			if self.isIssuePattern(ll):
-				if issue_chain:
-					yield issue_chain
-				issue_chain = []
-			issue_chain.append(ll)
-		yield issue_chain
-
-	def generateIssues(self, log):
-		files = dict()
-		for il in self.splitReportToIssueChain(log):
-			if len(il) < 1:
-				continue
-			mo = re.match('^(.*):(\d+):(\d+): warning: (.*)$', il[0])
-			if mo and len(il) >= 2:
-				yield Issue(mo.group(1), int(mo.group(2)), int(mo.group(3)),
-					mo.group(4), il[1])
-				continue
-			m2 = re.match('^\[(.*?):(\d+)\].*: \((error|warning|performance|style)\) (.*)$', il[0])
-			if m2:
-				yield Issue(m2.group(1), int(m2.group(2)), 0, m2.group(4), '')
+	def generateFileMap(self, files):
+		fm = {}
+		for f in sorted(set(files), key=lambda f: len(f), reverse=True):
+			ff = next((ff for ff in fm.keys() if ff.endswith('/' + f)), f)
+			fm[f] = ff
+		return fm
 
 	def files(self):
-		files = set()
-		for i in self.report:
-			if i.file not in files:
-				files.add(i.file)
-				yield i.file
+		return iter(self._files)
 
 	def issues(self):
-		for i in self.report:
-			yield i
+		return iter(self._issues)

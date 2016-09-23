@@ -19,7 +19,8 @@ class TestIssue:
 
 class TestReport(Report):
 	def __init__(self, issues):
-		self.report = issues
+		self._issues = list(issues)
+		self._files = set((i.file for i in self._issues))
 
 
 class TestReportStorage(TestCase):
