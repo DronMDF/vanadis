@@ -24,8 +24,8 @@ class Issue:
 
 
 class Report:
-	def __init__(self, report_text):
-		self.report = set(self.generateIssues(report_text))
+	def __init__(self, report_stream):
+		self.report = set(self.generateIssues(''.join(report_stream.readlines())))
 
 	def isIssuePattern(self, l):
 		if re.match('^.*:\d+:\d+: warning: .*$', l):

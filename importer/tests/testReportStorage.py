@@ -1,3 +1,4 @@
+import io
 import random
 import string
 import time
@@ -84,7 +85,7 @@ class TestReportStoragePerformance(TestCase):
 		return '\n'.join(rl() for _ in range(1000))
 
 	def setUp(self):
-		self.report = Report(self.generateKiloReport())
+		self.report = Report(io.StringIO(self.generateKiloReport()))
 		self.start_time = time.time()
 
 	def tearDown(self):
