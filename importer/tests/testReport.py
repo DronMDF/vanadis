@@ -1,5 +1,6 @@
-import string
+import io
 import random
+import string
 import time
 from django.test import TestCase
 from importer.Report import Report
@@ -8,9 +9,9 @@ from importer.Report import Report
 class TestReport(TestCase):
 	def testParseSimpleClangReport(self):
 		# Given
-		report = Report('\n'.join([
-			'pid_output.c:101:30: warning: implicit conversion',
-			'    else if (ftruncate(fd, pidsize) < 0)']))
+		report_text = '\n'.join(('pid_output.c:101:30: warning: implicit conversion',
+			'    else if (ftruncate(fd, pidsize) < 0)'))
+		report = Report(io.StringIO(report_text))
 		# When
 		files = list(report.files())
 		# Then
@@ -18,9 +19,9 @@ class TestReport(TestCase):
 
 	def testReportAllowIterateOverIssues(self):
 		# Given
-		report = Report('\n'.join([
-			'pid_output.c:101:30: warning: implicit conversion',
-			'    else if (ftruncate(fd, pidsize) < 0)']))
+		report_text = '\n'.join(('pid_output.c:101:30: warning: implicit conversion',
+			'    else if (ftruncate(fd, pidsize) < 0)'))
+		report = Report(io.StringIO(report_text))
 		# When
 		issue = next(report.issues())
 		# Then
@@ -32,25 +33,25 @@ class TestReport(TestCase):
 
 	def testReportShouldCutDitsFromPath(self):
 		# Given
-		report = Report('\n'.join([
+		report_text = '\n'.join([
 			'dir/pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)',
 			'./in/pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)',
 			'../pid_output.c:101:30: warning: implicit conversion',
-			'    else if (ftruncate(fd, pidsize) < 0)']))
+			'    else if (ftruncate(fd, pidsize) < 0)'])
+		report = Report(io.StringIO(report_text))
 		# When
-		files = list(report.files())
+		files = set(report.files())
 		# Then
-		self.assertIn('dir/pid_output.c', files)
-		self.assertIn('in/pid_output.c', files)
-		self.assertIn('pid_output.c', files)
+		self.assertSetEqual(files, {'dir/pid_output.c', 'in/pid_output.c'})
 
 	def testParseCppcheckWarning(self):
 		# Given
-		report = Report(("[bgpd/bgp_aspath.c:1867] -> [bgpd/bgp_aspath.c:1865]:"
+		report_text = ("[bgpd/bgp_aspath.c:1867] -> [bgpd/bgp_aspath.c:1865]:"
 			" (warning) Either the condition 'seg2' is redundant or there"
-			" is possible null pointer dereference: seg2."))
+			" is possible null pointer dereference: seg2.")
+		report = Report(io.StringIO(report_text))
 		# When
 		files = list(report.files())
 		issues = list(report.issues())
@@ -64,8 +65,9 @@ class TestReport(TestCase):
 
 	def testParseCppcheckStyle(self):
 		# Given
-		report = Report(("[bgpd/bgp_aspath.c:147]: (style) "
-			"The scope of the variable 'prev' can be reduced."))
+		report_text = ("[bgpd/bgp_aspath.c:147]: (style) "
+			"The scope of the variable 'prev' can be reduced.")
+		report = Report(io.StringIO(report_text))
 		# When
 		files = list(report.files())
 		issues = list(report.issues())
@@ -79,8 +81,9 @@ class TestReport(TestCase):
 
 	def testParseCppcheckError(self):
 		# Given
-		report = Report(("[bgpd/bgp_route.c:358]: "
-			"(error) Uninitialized struct member: newattr.extra"))
+		report_text = ("[bgpd/bgp_route.c:358]: "
+			"(error) Uninitialized struct member: newattr.extra")
+		report = Report(io.StringIO(report_text))
 		# When
 		files = list(report.files())
 		issues = list(report.issues())
@@ -94,9 +97,10 @@ class TestReport(TestCase):
 
 	def testParseCppcheckPerformance(self):
 		# Given
-		report = Report(("[ripngd/ripngd.c:2101] -> [ripngd/ripngd.c:2108]: "
+		report_text = ("[ripngd/ripngd.c:2101] -> [ripngd/ripngd.c:2108]: "
 			"(performance) Variable 'len' is reassigned a value "
-			"before the old one has been used."))
+			"before the old one has been used.")
+		report = Report(io.StringIO(report_text))
 		# When
 		files = list(report.files())
 		issues = list(report.issues())
@@ -110,8 +114,9 @@ class TestReport(TestCase):
 
 	def testParseCppcheckInformationIsNotIssue(self):
 		# Given
-		report = Report(("[./bgpd/bgp_main.c:1]: (information) "
-			"Skipping configuration 'QUAGGA_GROUP;QUAGGA_USER'"))
+		report_text = ("[./bgpd/bgp_main.c:1]: (information) "
+			"Skipping configuration 'QUAGGA_GROUP;QUAGGA_USER'")
+		report = Report(io.StringIO(report_text))
 		# Then
 		self.assertListEqual(list(report.files()), [])
 		self.assertListEqual(list(report.issues()), [])
@@ -134,11 +139,11 @@ class TestReportPerformance(TestCase):
 
 	def tearDown(self):
 		delta = time.time() - self.start_time
-		self.assertLess(delta, 0.05)
+		self.assertLess(delta, 0.5)
 
 	def testKiloIssuesParsing(self):
 		# When
-		report = Report(self.report_text)
+		report = Report(io.StringIO(self.report_text))
 		# Then
 		self.assertGreater(len(list(report.files())), 0)
 		self.assertGreater(len(list(report.issues())), 0)

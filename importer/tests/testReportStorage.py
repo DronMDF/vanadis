@@ -1,3 +1,4 @@
+import io
 import random
 import string
 import time
@@ -18,7 +19,8 @@ class TestIssue:
 
 class TestReport(Report):
 	def __init__(self, issues):
-		self.report = issues
+		self._issues = list(issues)
+		self._files = set((i.file for i in self._issues))
 
 
 class TestReportStorage(TestCase):
@@ -84,7 +86,7 @@ class TestReportStoragePerformance(TestCase):
 		return '\n'.join(rl() for _ in range(1000))
 
 	def setUp(self):
-		self.report = Report(self.generateKiloReport())
+		self.report = Report(io.StringIO(self.generateKiloReport()))
 		self.start_time = time.time()
 
 	def tearDown(self):
