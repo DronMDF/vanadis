@@ -19,7 +19,7 @@ class TestClangImport(TestCase):
 		self.assertEqual(issue.file.path, 'pid_output.c')
 		self.assertEqual(issue.line, 101)
 		self.assertEqual(issue.position, 30)
-		self.assertEqual(issue.text, 'implicit conversion')
+		self.assertEqual(issue.text, 'warning: implicit conversion')
 		self.assertEqual(issue.code, '    else if (ftruncate(fd, pidsize) < 0)')
 
 	def testImportLogWithDublicates(self):
