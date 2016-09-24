@@ -28,7 +28,7 @@ class TestReport(TestCase):
 		self.assertEqual(issue.file, 'pid_output.c')
 		self.assertEqual(issue.line, 101)
 		self.assertEqual(issue.position, 30)
-		self.assertEqual(issue.message, 'implicit conversion')
+		self.assertEqual(issue.message, 'warning: implicit conversion')
 		self.assertEqual(issue.code, '    else if (ftruncate(fd, pidsize) < 0)')
 
 	def testReportShouldCutDitsFromPath(self):
@@ -60,7 +60,7 @@ class TestReport(TestCase):
 		self.assertEqual(len(issues), 1)
 		self.assertEqual(issues[0].file, 'bgpd/bgp_aspath.c')
 		self.assertEqual(issues[0].line, 1867)
-		self.assertEqual(issues[0].message, ("Either the condition 'seg2' "
+		self.assertEqual(issues[0].message, ("warning: Either the condition 'seg2' "
 			"is redundant or there is possible null pointer dereference: seg2."))
 
 	def testParseCppcheckStyle(self):
@@ -77,7 +77,7 @@ class TestReport(TestCase):
 		self.assertEqual(issues[0].file, 'bgpd/bgp_aspath.c')
 		self.assertEqual(issues[0].line, 147)
 		self.assertEqual(issues[0].message,
-			"The scope of the variable 'prev' can be reduced.")
+			"style: The scope of the variable 'prev' can be reduced.")
 
 	def testParseCppcheckError(self):
 		# Given
@@ -93,7 +93,7 @@ class TestReport(TestCase):
 		self.assertEqual(issues[0].file, 'bgpd/bgp_route.c')
 		self.assertEqual(issues[0].line, 358)
 		self.assertEqual(issues[0].message,
-			"Uninitialized struct member: newattr.extra")
+			"error: Uninitialized struct member: newattr.extra")
 
 	def testParseCppcheckPerformance(self):
 		# Given
@@ -109,8 +109,8 @@ class TestReport(TestCase):
 		self.assertEqual(len(issues), 1)
 		self.assertEqual(issues[0].file, 'ripngd/ripngd.c')
 		self.assertEqual(issues[0].line, 2101)
-		self.assertEqual(issues[0].message,
-			"Variable 'len' is reassigned a value before the old one has been used.")
+		self.assertEqual(issues[0].message, ("performance: Variable 'len' is reassigned "
+			"a value before the old one has been used."))
 
 	def testParseCppcheckInformationIsNotIssue(self):
 		# Given

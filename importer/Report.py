@@ -40,14 +40,15 @@ class IssueStream:
 
 	def __next__(self):
 		for rl in self.stream:
-			m1 = re.match('^(.*):(\d+):(\d+): warning: (.*)$', rl)
+			m1 = re.match('^(.*):(\d+):(\d+): (warning: .*)$', rl)
 			if m1:
 				return Issue(m1.group(1), int(m1.group(2)), int(m1.group(3)),
 					m1.group(4), next(self.stream).rstrip())
 			m2 = re.match(('^\[(.*?):(\d+)\].*: '
 				'\((error|warning|performance|style)\) (.*)$'), rl)
 			if m2:
-				return Issue(m2.group(1), int(m2.group(2)), 0, m2.group(4), '')
+				return Issue(m2.group(1), int(m2.group(2)), 0,
+					m2.group(3) + ': ' + m2.group(4), '')
 		raise StopIteration
 
 
