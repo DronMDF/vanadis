@@ -14,7 +14,7 @@
 {% for line in sourcecode %}
 <tr>
 	<td>{{line.line}}</td>
-	<td><pre>{{line.code}}</pre></td>
+	<td><pre style="margin: 0">{{line.code}}</pre></td>
 </tr>
 {% for issue in line.issues %}
 <tr>
