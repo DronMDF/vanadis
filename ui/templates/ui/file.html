@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html>
+<head>
+	<style>
+		td {
+			font-family: monospace;
+		}
+	</style>
+<head>
 <body>
 <h1>{{projectname}}/{{filename}}</h1>
 <p/>
-<font face='monospace'>
+<table>
 {% for line in sourcecode %}
-<pre>{{line.code}}</pre>
+<tr>
+	<td>{{line.line}}</td>
+	<td><pre>{{line.code}}</pre></td>
+</tr>
 {% for issue in line.issues %}
-<p style="text-indent: {{issue.position|add:"-1"}}ch">^ {{issue.text}}</p>
+<tr>
+	<td/>
+	<td><div style="text-indent: {{issue.position|add:"-1"}}ch">^ {{issue.text}}</div></td>
+</tr>
 {% endfor %}
 {% endfor %}
+</table>
 </font>
 </body>
 </html>
