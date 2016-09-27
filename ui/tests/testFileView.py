@@ -13,7 +13,7 @@ class TestFileView(TestCase):
 		Issue.objects.create(project=p, file=xxx, code='aaa',
 				line=7, position=10, text='End bad')
 		# When
-		response = Client().get('/ui/project/ff/xxx')
+		response = Client().get('/ff/xxx')
 		# Then
 		sc = response.context['sourcecode']
 		self.assertEqual(sc[0]['code'], 'aaa')

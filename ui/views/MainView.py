@@ -3,7 +3,7 @@ from base.models import Issue, Project
 
 
 class MainView(TemplateView, ):
-	template_name = 'ui/index.html'
+	template_name = 'index.html'
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)

@@ -20,9 +20,9 @@ class NewProjectForm(ModelForm):
 
 
 class NewProjectView(FormView):
-	template_name = 'ui/new_project.html'
+	template_name = 'new_project.html'
 	form_class = NewProjectForm
 
 	def form_valid(self, form):
 		project = form.save()
-		return redirect('/ui/project/%s' % project.name)
+		return redirect('/%s' % project.name)

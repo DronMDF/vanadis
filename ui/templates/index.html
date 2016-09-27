@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Vanadis</h1>
+<p>
+<a href='/newproject'>Create new project</a>
+<p>Projects:</p>
+{% for project in projects %}
+	<a href='/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
+{% endfor %}
+</body>
+</html>

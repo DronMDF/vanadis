@@ -5,25 +5,25 @@ from base.models import File, Issue, Project
 class TestProject(TestCase):
 	def testProjectShouldContainValidChars(self):
 		# When
-		response = Client().post('/ui/project', data={'name': '%letter'})
+		response = Client().post('/newproject', data={'name': '%letter'})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameShouldBeUnder100Chars(self):
 		# When
-		response = Client().post('/ui/project', data={'name': 'a' * 101})
+		response = Client().post('/newproject', data={'name': 'a' * 101})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameRejectIfDigitAtBegin(self):
 		# When
-		response = Client().post('/ui/project', data={'name': '007a'})
+		response = Client().post('/newproject', data={'name': '007a'})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectLongValidNameAreAcepted(self):
 		# When
-		response = Client().post('/ui/project', data={'name': 'x' * 100})
+		response = Client().post('/newproject', data={'name': 'x' * 100})
 		# Then
 		self.assertEqual(response.status_code, 302)		# Ok
 
@@ -31,10 +31,10 @@ class TestProject(TestCase):
 		# Given
 		Project.objects.all().delete()
 		# When
-		response = Client().post('/ui/project', data={'name': 'test_project'})
+		response = Client().post('/newproject', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/ui/project/test_project')
+		self.assertEqual(response.url, '/test_project')
 		Project.objects.get(name='test_project')		# Not raise
 
 	def testProjectPageHoldProjectName(self):
@@ -42,7 +42,7 @@ class TestProject(TestCase):
 		name = 'name-of-project'
 		Project.objects.create(name=name)
 		# When
-		response = Client().get('/ui/project/%s/' % name)
+		response = Client().get('/%s' % name)
 		# Then
 		self.assertEqual(response.status_code, 200)
 		self.assertIn(name, response.content.decode('utf-8'))
@@ -52,11 +52,11 @@ class TestProject(TestCase):
 		name = 'name-of-project'
 		Project.objects.create(name=name)
 		# When
-		response = Client().get('/ui/project/%s/' % name)
+		response = Client().get('/%s' % name)
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.content.decode('utf-8')
-		self.assertIn('/ui/project/%s/import' % name, response.content.decode('utf-8'))
+		self.assertIn('/%s/import' % name, response.content.decode('utf-8'))
 
 	def testProjectPageContainListOfFiles(self):
 		# Given
@@ -66,7 +66,7 @@ class TestProject(TestCase):
 		Issue.objects.create(project=project, file=test1, line=0, position=0)
 		Issue.objects.create(project=project, file=xen, line=0, position=0)
 		# When
-		response = Client().get('/ui/project/%s/' % project.name)
+		response = Client().get('/%s' % project.name)
 		# Then
 		content = response.content.decode('utf-8')
 		self.assertIn('test1.c', content)
@@ -81,7 +81,7 @@ class TestProject(TestCase):
 		Issue.objects.create(project=project, file=xen, line=0, position=0)
 		Issue.objects.create(project=project, file=xen, line=1, position=0)
 		# When
-		response = Client().get('/ui/project/%s/' % project.name)
+		response = Client().get('/%s' % project.name)
 		# Then
 		content = response.content.decode('utf-8')
 		self.assertRegex(content, 'test1.c[^2]+1')

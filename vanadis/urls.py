@@ -3,7 +3,5 @@ from django.contrib import admin
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-	url(r'^$', RedirectView.as_view(url='/ui', permanent=False), name='index'),
-	url(r'^ui/', include('ui.urls')),
-	url(r'^admin/', admin.site.urls),
+	url(r'', include('ui.urls'))
 ]

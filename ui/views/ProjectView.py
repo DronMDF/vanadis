@@ -5,11 +5,11 @@ from base.models import File, Issue, Project
 
 
 class ProjectView(TemplateView):
-	template_name = 'ui/project.html'
+	template_name = 'project.html'
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		projectname = kwargs['name']
+		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
 		files = File.objects.filter(project=project).order_by('path')
 		files_info = [{

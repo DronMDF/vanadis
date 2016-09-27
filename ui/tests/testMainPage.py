@@ -3,20 +3,13 @@ from base.models import File, Issue, Project
 
 
 class TestMainPage(TestCase):
-	def testRootPageRedirectToUI(self):
-		# When
-		response = Client().get('/')
-		# Then
-		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/ui')
-
 	def testProjectListShowOnMainPage(self):
 		# Given
 		Project.objects.all().delete()
 		Project.objects.create(name='test1')
 		Project.objects.create(name='test2')
 		# When
-		response = Client().get('/ui/')
+		response = Client().get('/')
 		# Then
 		self.assertEqual(response.status_code, 200)
 		text = response.content.decode('utf-8')
@@ -34,7 +27,7 @@ class TestMainPage(TestCase):
 		Issue.objects.create(project=tp1, file=file1, line=0, position=0)
 		Issue.objects.create(project=tp2, file=file2, line=0, position=0)
 		# When
-		response = Client().get('/ui/')
+		response = Client().get('/')
 		# Then
 		self.assertEqual(response.status_code, 200)
 		text = response.content.decode('utf-8')

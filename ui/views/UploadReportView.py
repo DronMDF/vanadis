@@ -25,6 +25,6 @@ class UploadReportView(FormView):
 		if form.is_valid():
 			projectname = kwargs['projectname']
 			uploadReport(projectname, request.FILES['report'])
-			return redirect('/ui/project/%s/' % projectname)
+			return redirect('/%s' % projectname)
 		else:
 			return self.render_to_response(self.get_context_data(**kwargs))
