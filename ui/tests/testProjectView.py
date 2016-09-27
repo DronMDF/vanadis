@@ -17,7 +17,7 @@ class TestProjectSettingsView(TestCase):
 		Project.objects.all().delete()
 		p = Project.objects.create(name='setp')
 		# When
-		reply = Client().get('/ui/project/setp/')
+		reply = Client().get('/ui/setp')
 		# Then
 		self.assertEqual(reply.status_code, 200)
 		self.assertIn("href='/ui/setp/settings'", reply.content.decode('utf-8'))

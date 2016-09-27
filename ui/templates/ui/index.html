@@ -3,10 +3,10 @@
 <body>
 <h1>Vanadis</h1>
 <p>
-<a href='/ui/project'>Create new project</a>
+<a href='/ui/newproject'>Create new project</a>
 <p>Projects:</p>
 {% for project in projects %}
-	<a href='/ui/project/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
+	<a href='/ui/{{project.name}}'>{{project.name}}</a> with {{project.issue_count}} issues</br>
 {% endfor %}
 </body>
 </html>

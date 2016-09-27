@@ -25,4 +25,4 @@ class NewProjectView(FormView):
 
 	def form_valid(self, form):
 		project = form.save()
-		return redirect('/ui/project/%s' % project.name)
+		return redirect('/ui/%s' % project.name)

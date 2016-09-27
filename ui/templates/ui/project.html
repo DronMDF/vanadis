@@ -2,12 +2,12 @@
 <html>
 <body>
 <h1>{{project.name}}</h1>
-<p><a href='/ui/project/{{project.name}}/import'>Upload report file</a></p>
+<p><a href='/ui/{{project.name}}/import'>Upload report file</a></p>
 <p><a href='/ui/{{project.name}}/settings'>Settings</a></p>
 <p/>
 Files:<br/>
 {% for file in files %}
-<a href='/ui/project/{{project.name}}/{{file.name}}'>{{file.name}}</a> with {{file.issue_count}} issues<br/>
+<a href='/ui/{{project.name}}/{{file.name}}'>{{file.name}}</a> with {{file.issue_count}} issues<br/>
 {% endfor %}
 </body>
 </html>

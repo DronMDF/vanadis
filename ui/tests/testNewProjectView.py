@@ -8,5 +8,5 @@ class TestNewProjectView(TestCase):
 		response = Client().post('/ui/newproject', data={'name': 't2'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/ui/project/t2')
+		self.assertEqual(response.url, '/ui/t2')
 		Project.objects.get(name='t2')		# Not raise
