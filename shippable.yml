@@ -11,7 +11,7 @@ build:
     pull: true
 
   ci:
-    - apt-get -y install language-pack-en python3-pip
+    - apt-get -y install language-pack-en python3-pip python3-pygit2
     - pip3 install --upgrade pip
     - pip3 install coverage
     - pip3 install Django==1.10

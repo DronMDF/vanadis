@@ -8,7 +8,7 @@ class TestClangImport(TestCase):
 		# Given
 		Project.objects.all().delete()
 		name = 'clang-project'
-		Project.objects.create(name=name)
+		Project.objects.create(name=name, repo_url='git://git.savannah.nongnu.org/quagga.git')
 		log = StringIO('\n'.join([
 			'pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)']))
@@ -26,7 +26,7 @@ class TestClangImport(TestCase):
 		# Given
 		Project.objects.all().delete()
 		name = 'clang-project'
-		Project.objects.create(name=name)
+		Project.objects.create(name=name, repo_url='git://git.savannah.nongnu.org/quagga.git')
 		log = StringIO('\n'.join([
 			'dir/pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)',
