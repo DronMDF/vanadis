@@ -5,25 +5,25 @@ from base.models import File, Issue, Project
 class TestProject(TestCase):
 	def testProjectShouldContainValidChars(self):
 		# When
-		response = Client().post('/ui/project', data={'name': '%letter'})
+		response = Client().post('/ui/newproject', data={'name': '%letter'})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameShouldBeUnder100Chars(self):
 		# When
-		response = Client().post('/ui/project', data={'name': 'a' * 101})
+		response = Client().post('/ui/newproject', data={'name': 'a' * 101})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectNameRejectIfDigitAtBegin(self):
 		# When
-		response = Client().post('/ui/project', data={'name': '007a'})
+		response = Client().post('/ui/newproject', data={'name': '007a'})
 		# Then
 		self.assertEqual(response.status_code, 200)
 
 	def testProjectLongValidNameAreAcepted(self):
 		# When
-		response = Client().post('/ui/project', data={'name': 'x' * 100})
+		response = Client().post('/ui/newproject', data={'name': 'x' * 100})
 		# Then
 		self.assertEqual(response.status_code, 302)		# Ok
 
@@ -31,7 +31,7 @@ class TestProject(TestCase):
 		# Given
 		Project.objects.all().delete()
 		# When
-		response = Client().post('/ui/project', data={'name': 'test_project'})
+		response = Client().post('/ui/newproject', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response.url, '/ui/project/test_project')
