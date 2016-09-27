@@ -4,7 +4,7 @@ from base.models import Project
 
 
 class ProjectSettingView(UpdateView):
-	fields = []
+	fields = ['repo_url']
 	model = Project
 	template_name = 'project_settings.html'
 
@@ -18,4 +18,4 @@ class ProjectSettingView(UpdateView):
 		return context
 
 	def get_success_url(self):
-		return '/ui/project/%s' % self.object.name
+		return '/%s' % self.object.name

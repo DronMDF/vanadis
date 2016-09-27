@@ -3,6 +3,7 @@ from django.db import models
 
 class Project(models.Model):
 	name = models.CharField(max_length=100, db_index=True)
+	repo_url = models.CharField(max_length=256, null=True)
 
 
 class File(models.Model):
