@@ -5,7 +5,7 @@ from base.models import Issue, Project
 
 
 class FileView(TemplateView):
-	template_name = 'ui/file.html'
+	template_name = 'file.html'
 
 	def sortedLineIssue(self, issues):
 		return [{

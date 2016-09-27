@@ -6,7 +6,7 @@ from base.models import Project
 class ProjectSettingView(UpdateView):
 	fields = []
 	model = Project
-	template_name = 'ui/project_settings.html'
+	template_name = 'project_settings.html'
 
 	def get_object(self):
 		name = self.kwargs['projectname']
