@@ -13,7 +13,7 @@ class NewProjectForm(ModelForm):
 	def clean(self):
 		cleaned_data = super().clean()
 		name = cleaned_data.get('name', '')
-		valid_re = ['^[a-zA-Z]+', '[a-zA-Z0-9]+$', '^[\w-]+$']
+		valid_re = [r'^[a-zA-Z]+', r'[a-zA-Z0-9]+$', r'^[\w-]+$']
 		if not all((re.search(e, name) for e in valid_re)):
 			raise ValidationError('Invalid value')
 		return cleaned_data

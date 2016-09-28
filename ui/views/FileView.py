@@ -1,7 +1,6 @@
 from itertools import groupby
 from django.views.generic import TemplateView
-from django.shortcuts import get_object_or_404
-from base.models import Issue, Project
+from base.models import Issue
 
 
 class FileView(TemplateView):

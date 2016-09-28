@@ -13,7 +13,7 @@ class TestClangImport(TestCase):
 			'pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)']))
 		# When
-		response = Client().post('/%s/import' % name, data={'report': log})
+		Client().post('/%s/import' % name, data={'report': log})
 		# Then
 		issue = Issue.objects.get(project__name=name)
 		self.assertEqual(issue.file.path, 'pid_output.c')
@@ -35,7 +35,7 @@ class TestClangImport(TestCase):
 			'../pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)']))
 		# When
-		response = Client().post('/%s/import' % name, data={'report': log})
+		Client().post('/%s/import' % name, data={'report': log})
 		# Then
 		issue = Issue.objects.filter(project__name=name)
 		self.assertEqual(len(issue), 1)

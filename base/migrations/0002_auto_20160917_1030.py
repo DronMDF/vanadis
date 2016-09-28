@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('base', '0001_initial'),
-    ]
+	dependencies = [
+		('base', '0001_initial'),
+	]
 
-    operations = [
-        migrations.AlterField(
-            model_name='file',
-            name='path',
-            field=models.CharField(db_index=True, max_length=4096),
-        ),
-    ]
+	operations = [
+		migrations.AlterField(
+			model_name='file',
+			name='path',
+			field=models.CharField(db_index=True, max_length=4096),
+		),
+	]
