@@ -2,7 +2,6 @@
 
 if [ "${DATABASE}" = "postgresql" ]; then
 	echo "PostgreSQL database..."
-	pip install --upgrade wheel
 	pip install psycopg2
 	psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
 	psql -c "create database vanadisdb;" -U postgres
