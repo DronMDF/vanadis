@@ -3,16 +3,6 @@ from base.models import Project
 
 
 class TestProjectSettingsView(TestCase):
-	def testProjectSettingsUrl(self):
-		# Given
-		Project.objects.all().delete()
-		Project.objects.create(name='setp')
-		# When
-		reply = Client().get('/setp')
-		# Then
-		self.assertEqual(reply.status_code, 200)
-		self.assertIn("href='/setp/settings'", reply.content.decode('utf-8'))
-
 	def testProjectSettingView(self):
 		# Given
 		Project.objects.all().delete()
