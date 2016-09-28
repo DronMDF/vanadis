@@ -16,7 +16,7 @@ build:
     - pip install Django==1.10
     - pip install pep8
     - pip install unittest-xml-reporting
-    - find ./ -name "*.py" | xargs pep8 --show-source --max-line-length=100 --ignore=W191,E128
+    - ./style.sh
     - ./dbinit.sh
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
