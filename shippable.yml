@@ -15,6 +15,7 @@ build:
     - pip install --upgrade pip
     - pip install Django==1.10
     - pip install pep8
+    - pip install pylint
     - pip install unittest-xml-reporting
     - ./style.sh
     - ./dbinit.sh
