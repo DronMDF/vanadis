@@ -41,7 +41,6 @@ class TestProjectView(TestCase):
 		response = Client().get('/%s' % name)
 		# Then
 		self.assertEqual(response.status_code, 200)
-		content = response.content.decode('utf-8')
 		self.assertIn('/%s/import' % name, response.content.decode('utf-8'))
 
 	def testProjectPageContainListOfFiles(self):

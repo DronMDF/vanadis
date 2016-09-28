@@ -8,7 +8,7 @@ class ProjectSettingView(UpdateView):
 	model = Project
 	template_name = 'project_settings.html'
 
-	def get_object(self):
+	def get_object(self, queryset=None):
 		name = self.kwargs['projectname']
 		return get_object_or_404(Project, name=name)
 
