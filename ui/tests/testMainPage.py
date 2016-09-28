@@ -3,6 +3,13 @@ from base.models import File, Issue, Project
 
 
 class TestMainPage(TestCase):
+	def testNewHref(self):
+		# When
+		response = Client().get('/')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		self.assertIn("href='/newproject'", response.content.decode('utf-8'))
+
 	def testProjectListShowOnMainPage(self):
 		# Given
 		Project.objects.all().delete()
