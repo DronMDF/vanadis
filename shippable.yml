@@ -1,23 +1,23 @@
 language: python
 
-python:
-  - "3.5"
-
 env:
   - DATABASE=sqlite
   - DATABASE=postgresql
 
-services:
-  - postgres
-
 build:
+  pre_ci_boot:
+    image_name: library/ubuntu
+    image_tag: 16.04
+    pull: true
+
   ci:
-    - pip install --upgrade pip
-    - pip install --upgrade wheel
-    - pip install Django==1.10
-    - pip install pep8
-    - pip install pylint
-    - pip install unittest-xml-reporting
+    - apt-get -y install language-pack-en python3-pip
+    - pip3 install --upgrade pip
+    - pip3 install coverage
+    - pip3 install Django==1.10
+    - pip3 install pep8
+    - pip3 install pylint
+    - pip3 install unittest-xml-reporting
     - ./style.sh
     - ./dbinit.sh
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner

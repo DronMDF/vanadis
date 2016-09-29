@@ -1,10 +1,11 @@
 #!/bin/sh
-
+set -e
 if [ "${DATABASE}" = "postgresql" ]; then
 	echo "PostgreSQL database..."
-	pip install psycopg2
-	psql -c "create role vanadis with login createdb password 'vanadis';" -U postgres
-	psql -c "create database vanadisdb;" -U postgres
+	apt-get -y install postgresql python3-psycopg2
+	service postgresql start
+	runuser -u postgres -- psql -c "create role vanadis with login createdb password 'vanadis';"
+	runuser -u postgres -- psql -c "create database vanadisdb;"
 else
 	echo "Sqlite database..."
 fi
