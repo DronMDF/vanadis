@@ -71,3 +71,12 @@ class TestProjectView(TestCase):
 		content = response.content.decode('utf-8')
 		self.assertRegex(content, 'test1.c[^2]+1')
 		self.assertRegex(content, 'xeh.h[^1]+2')
+
+	def testProjectPageOpenAtLastProjectRevision(self):
+		# Given
+		Project.objects.create(name='last', repo_url='file:///tmp/test')
+		# When
+		response = Client().get('/last')
+		# Then
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response.url, '/last/67c47e6')

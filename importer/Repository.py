@@ -17,3 +17,7 @@ class Repository:
 			self.repo.remotes['origin'].fetch()
 		except pygit2.GitError as e:
 			raise RuntimeError('Fetch problem') from e
+
+	def head(self):
+		ref = self.repo.lookup_reference('HEAD')
+		return str(ref.peel().id)[:7]
