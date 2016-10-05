@@ -2,8 +2,9 @@ from base.models import File, Issue
 
 
 class ReportStorage:
-	def __init__(self, project):
+	def __init__(self, project, repo=None):
 		self.project = project
+		self.repo = repo
 
 	def pathMatch(self, p, ef):
 		for ee in ef:

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from base.models import File, Issue, Project
+from importer.Repository import Repository
 
 
 class ProjectView(TemplateView):
@@ -18,3 +19,13 @@ class ProjectView(TemplateView):
 		context['project'] = project
 		context['files'] = files_info
 		return context
+
+	def get(self, request, *args, **kwargs):
+		projectname = kwargs['projectname']
+		project = get_object_or_404(Project, name=projectname)
+		try:
+			repo = Repository(project)
+			return redirect('/%s/%s' % (project.name, repo.head()))
+		except RuntimeError:
+			pass
+		return super().get(request, *args, **kwargs)

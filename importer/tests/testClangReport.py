@@ -8,13 +8,14 @@ class TestClangImport(TestCase):
 		# Given
 		Project.objects.all().delete()
 		name = 'clang-project'
-		Project.objects.create(name=name)
+		Project.objects.create(name=name, repo_url='file:///tmp/test')
 		log = StringIO('\n'.join([
 			'pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)']))
 		# When
-		Client().post('/%s/import' % name, data={'report': log})
+		response = Client().post('/%s/import' % name, data={'report': log})
 		# Then
+		self.assertEqual(response.status_code, 302)
 		issue = Issue.objects.get(project__name=name)
 		self.assertEqual(issue.file.path, 'pid_output.c')
 		self.assertEqual(issue.line, 101)
@@ -26,7 +27,7 @@ class TestClangImport(TestCase):
 		# Given
 		Project.objects.all().delete()
 		name = 'clang-project'
-		Project.objects.create(name=name)
+		Project.objects.create(name=name, repo_url='file:///tmp/test')
 		log = StringIO('\n'.join([
 			'dir/pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)',
@@ -35,7 +36,8 @@ class TestClangImport(TestCase):
 			'../pid_output.c:101:30: warning: implicit conversion',
 			'    else if (ftruncate(fd, pidsize) < 0)']))
 		# When
-		Client().post('/%s/import' % name, data={'report': log})
+		response = Client().post('/%s/import' % name, data={'report': log})
 		# Then
+		self.assertEqual(response.status_code, 302)
 		issue = Issue.objects.filter(project__name=name)
 		self.assertEqual(len(issue), 1)

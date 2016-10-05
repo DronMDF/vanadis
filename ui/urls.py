@@ -7,5 +7,6 @@ urlpatterns = [
 	url(r'^(?P<projectname>[\w-]+)$', ProjectView.as_view()),
 	url(r'^(?P<projectname>[\w-]+)/import', UploadReportView.as_view()),
 	url(r'^(?P<projectname>[\w-]+)/settings$', ProjectSettingView.as_view()),
+	url(r'^(?P<projectname>[\w-]+)/(?P<revision>[0-9a-fA-F]{7})$', RevisionView.as_view()),
 	url(r'^(?P<projectname>[\w-]+)/(?P<filename>.*)$', FileView.as_view()),
 ]

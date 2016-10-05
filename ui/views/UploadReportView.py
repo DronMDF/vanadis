@@ -1,6 +1,7 @@
 from django.forms import Form, FileField
 from django.shortcuts import redirect
 from django.views.generic.edit import FormView
+from django.http.response import Http404, HttpResponse
 from importer.issue import uploadReport
 
 
@@ -9,7 +10,7 @@ class UpdateReportForm(Form):
 
 
 class UploadReportView(FormView):
-	template_name = 'ui/upload_report.html'
+	template_name = 'upload_report.html'
 	form_class = UpdateReportForm
 
 	def get_context_data(self, **kwargs):
@@ -24,7 +25,12 @@ class UploadReportView(FormView):
 		form = self.get_form()
 		if form.is_valid():
 			projectname = kwargs['projectname']
-			uploadReport(projectname, request.FILES['report'])
+			try:
+				uploadReport(projectname, request.FILES['report'])
+			except Http404:
+				raise
+			except RuntimeError:
+				return HttpResponse(status=503)
 			return redirect('/%s' % projectname)
 		else:
 			return self.render_to_response(self.get_context_data(**kwargs))
