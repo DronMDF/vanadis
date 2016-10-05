@@ -12,12 +12,14 @@ class RevisionView(TemplateView):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
-		try:
-			repo = Repository(project)
-		except RuntimeError:
-			return Http404('Reposytory does not exists')
 		context['project'] = project
-		context['prev'] = repo.prev()
-		context['head'] = repo.head()
+
+		revision = kwargs['revision']
+		try:
+			repo = Repository(project, revision)
+			context['revision'] = repo.head()
+			context['previous'] = repo.prev()
+		except RuntimeError:
+			return Http404('No revision')
 		context['files'] = []
 		return context
