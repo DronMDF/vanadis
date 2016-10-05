@@ -19,5 +19,9 @@ class Repository:
 			raise RuntimeError('Fetch problem') from e
 
 	def head(self):
-		ref = self.repo.lookup_reference('HEAD')
-		return str(ref.peel().id)[:7]
+		commit = self.repo.revparse_single('HEAD')
+		return str(commit.id)[:7]
+
+	def prev(self):
+		commit = self.repo.revparse_single('HEAD^')
+		return str(commit.id)[:7]
