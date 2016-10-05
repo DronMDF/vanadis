@@ -18,7 +18,9 @@ class RevisionView(TemplateView):
 		try:
 			repo = Repository(project, revision)
 			context['revision'] = repo.head()
-			context['previous'] = repo.prev()
+			previous = repo.prev()
+			if previous is not None:
+				context['previous'] = previous
 		except RuntimeError:
 			return Http404('No revision')
 		context['files'] = []

@@ -30,5 +30,8 @@ class Repository:
 		return str(commit.id)[:7]
 
 	def prev(self):
-		commit = self.repo.revparse_single(self.revision + '^')
-		return str(commit.id)[:7]
+		try:
+			commit = self.repo.revparse_single(self.revision + '^')
+			return str(commit.id)[:7]
+		except KeyError:
+			return None
