@@ -33,6 +33,6 @@ integrations:
   hub:
     - integrationName: docker
       type: docker
-        branches:
-          only:
-            - master
+      branches:
+        only:
+          - master
