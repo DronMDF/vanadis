@@ -26,10 +26,10 @@ build:
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
 
   post_ci:
-    - docker build -t dronmdf/vanadis:latest .
+    - docker build -t dronmdf/vanadis:devel .
 
   push:
-    - docker push dronmdf/vanadis:latest
+    - docker push dronmdf/vanadis:devel
 
 integrations:
   hub:
