@@ -25,7 +25,7 @@ build:
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
 
-  push:
+  post_ci:
     - docker build -t dronmdf/vanadis:latest .
     - docker push dronmdf/vanadis:latest
 
