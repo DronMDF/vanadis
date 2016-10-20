@@ -27,6 +27,8 @@ build:
 
   post_ci:
     - docker build -t dronmdf/vanadis:latest .
+
+  push:
     - docker push dronmdf/vanadis:latest
 
 integrations:
