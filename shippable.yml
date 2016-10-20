@@ -24,3 +24,15 @@ build:
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
+
+  push:
+    - docker build -t dronmdf/vanadis:latest .
+    - docker push dronmdf/vanadis:latest
+
+integrations:
+  hub:
+    - integrationName: docker
+      type: docker
+        branches:
+          only:
+            - master
