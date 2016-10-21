@@ -24,11 +24,9 @@ build:
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
-
-  post_ci:
     - docker build -t dronmdf/vanadis:devel .
 
-  push:
+  post_ci:
     - docker push dronmdf/vanadis:devel
 
 integrations:
