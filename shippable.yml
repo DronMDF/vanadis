@@ -24,3 +24,12 @@ build:
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml
+    - docker build -t dronmdf/vanadis:devel . # Build image always, for check
+
+  post_ci:
+    - if [ "$SHIPPABLE_JOB_NUMBER" == "1" -a "$BRANCH" == "master" ]; then docker push dronmdf/vanadis:devel; fi
+
+integrations:
+  hub:
+    - integrationName: docker
+      type: docker
