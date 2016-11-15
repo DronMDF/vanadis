@@ -1,0 +1,19 @@
+FROM debian:sid
+ENV TERM linux
+RUN apt-get update && \
+	apt-get install -y libhttp-parser2.1 python3-django && \
+	apt-get install -y cmake git libffi-dev libhttp-parser2.1 libhttp-parser-dev libssl-dev libz-dev python3-pip && \
+	git clone https://github.com/libgit2/libgit2.git /root/libgit2 && \
+	cd /root/libgit2 && \
+	git config --global user.email "dron.valyaev@gmail.com" && \
+	git config --global user.name "Andrey Valyaev" && \
+	git checkout v0.24.2 && \
+	git cherry-pick feb330d && \
+	cmake . && \
+	make && \
+	make install && \
+	pip3 install pygit2==0.24.2 && \
+	apt-get remove -y cmake git libffi-dev libhttp-parser-dev libssl-dev libz-dev python3-pip && \
+	apt-get autoremove -y && \
+	apt-get clean -y && \
+	cd / && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/libgit2
