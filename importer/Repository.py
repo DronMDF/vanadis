@@ -25,6 +25,10 @@ class Repository:
 		except pygit2.GitError as e:
 			raise RuntimeError('Fetch problem') from e
 
+	def revparse(self, rev):
+		commit = self.repo.revparse_single(rev)
+		return int.from_bytes(commit.id.raw[:4], 'big')
+
 	def head(self):
 		commit = self.repo.revparse_single(self.revision)
 		return str(commit.id)[:7]
