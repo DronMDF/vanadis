@@ -9,7 +9,7 @@ class UpdateReportForm(Form):
 	report = FileField()
 
 
-class UploadReportView(FormView):
+class UploadReportView(FormView):		# pylint: disable=too-many-ancestors
 	template_name = 'upload_report.html'
 	form_class = UpdateReportForm
 

@@ -1,5 +1,6 @@
 from django.conf.urls import url
-from .views import *
+from .views import (FileView, ImportView, MainView, NewProjectView, ProjectSettingView, ProjectView,
+	RevisionView)
 
 urlpatterns = [
 	url(r'^$', MainView.as_view(), name='index'),

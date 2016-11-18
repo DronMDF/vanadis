@@ -3,6 +3,7 @@ import re
 
 
 class Issue:
+	# pylint: disable=too-many-arguments
 	def __init__(self, filename, line, position, message, code):
 		self.file = self.canonicalPath(filename)
 		self.line = line
