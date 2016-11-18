@@ -9,6 +9,7 @@ from importer.ReportStorage import ReportStorage
 
 
 class TestIssue:
+	# pylint: disable=too-many-arguments
 	def __init__(self, file, line=77, position=88, message='Wow', code='nil'):
 		self.file = file
 		self.line = line
@@ -18,7 +19,7 @@ class TestIssue:
 
 
 class TestReport(Report):
-	def __init__(self, issues):
+	def __init__(self, issues):		# pylint: disable=super-init-not-called
 		self._issues = list(issues)
 		self._files = set((i.file for i in self._issues))
 

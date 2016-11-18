@@ -19,7 +19,7 @@ class NewProjectForm(ModelForm):
 		return cleaned_data
 
 
-class NewProjectView(FormView):
+class NewProjectView(FormView):		# pylint: disable=too-many-ancestors
 	template_name = 'new_project.html'
 	form_class = NewProjectForm
 

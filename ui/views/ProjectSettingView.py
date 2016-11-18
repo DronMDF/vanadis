@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from base.models import Project
 
 
-class ProjectSettingView(UpdateView):
+class ProjectSettingView(UpdateView):		# pylint: disable=too-many-ancestors
 	fields = ['repo_url']
 	model = Project
 	template_name = 'project_settings.html'
