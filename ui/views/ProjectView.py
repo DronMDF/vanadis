@@ -1,10 +1,10 @@
-from django.views.generic import TemplateView
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from base.models import File, Issue, Project
-from importer.Repository import Repository
+from ui.views import RepositoryBaseView
 
 
-class ProjectView(TemplateView):
+class ProjectView(RepositoryBaseView):
 	template_name = 'project.html'
 
 	def get_context_data(self, **kwargs):
@@ -24,8 +24,8 @@ class ProjectView(TemplateView):
 		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
 		try:
-			repo = Repository(project)
+			repo = self.getRepository(project)
 			return redirect('/%s/%s' % (project.name, repo.head()))
-		except RuntimeError:
+		except Http404:
 			pass
 		return super().get(request, *args, **kwargs)

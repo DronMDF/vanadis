@@ -1,23 +1,20 @@
 from django.test import RequestFactory, TestCase
 from base.models import Project
 from ui.views import RevisionView
+from . import FakeRepository
 
 
 class RevisionViewUT(RevisionView):
-	def getRepository(self, project, revision):
-		class FakeRepository:
-			def head(self):
-				return revision
+	repo = None
 
-			def prev(self):
-				return '1f8b852'
-		return FakeRepository()
+	def getRepository(self, project, revision=None):
+		return self.repo
 
 
 class TestRevisionView(TestCase):
 	def setUp(self):
 		self.factory = RequestFactory()
-		self.view = RevisionViewUT.as_view()
+		self.view = RevisionViewUT.as_view(repo=FakeRepository('1f8b852', '67c47e6'))
 
 	def testPageShowPreviousUrl(self):
 		# Given
