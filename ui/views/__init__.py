@@ -1,3 +1,5 @@
+from .RepositoryBaseView import RepositoryBaseView
+
 from .FileView import FileView
 from .MainView import MainView
 from .NewProjectView import NewProjectView

@@ -20,7 +20,6 @@ build:
     - pip3 install unittest-xml-reporting
     - ./style.sh
     - ./dbinit.sh
-    - git clone https://github.com/DronMDF/test.git /tmp/test
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
     - ./manage.py migrate
     - find ./ -name "*.py" | xargs coverage xml -o shippable/codecoverage/coverage.xml

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% load static %}
+<?xml-stylesheet type="text/xsl" href="{% static 'revision.xsl' %}"?>
+<revision>
+	<project_name>{{project.name}}</project_name>
+	<revision>{{revision}}</revision>
+{% if previous %}
+	<previous>{{previous}}</previous>
+{% endif %}
+{% for file in files %}
+	<file>
+		<oid>{{file.oid}}</oid>
+		<path>{{file.path}}</path>
+		<issue_count>{{file.issue_count}}</issue_count>
+	</file>
+{% endfor %}
+</revision>

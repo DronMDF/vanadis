@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pathlib import Path
 import pygit2
 
@@ -39,3 +40,16 @@ class Repository:
 			return str(commit.id)[:7]
 		except KeyError:
 			return None
+
+	def getTreeFiles(self, tree, prefix):
+		for te in tree:
+			filename = str(Path(prefix, te.name))
+			if te.type == 'blob':
+				File = namedtuple('File', ['oid', 'path'])
+				yield File(te.hex[:7], filename)
+			elif te.type == 'tree':
+				yield from self.getTreeFiles(self.repo[te.id], filename)
+
+	def getFiles(self, revision):
+		commit = self.repo.revparse_single(revision)
+		yield from self.getTreeFiles(commit.tree, '')
