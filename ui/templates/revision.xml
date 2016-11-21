@@ -3,7 +3,7 @@
 <?xml-stylesheet type="text/xsl" href="{% static 'revision.xsl' %}"?>
 <revision>
 	<project_name>{{project.name}}</project_name>
-	<current>{{revision}}</current>
+	<revision>{{revision}}</revision>
 {% if previous %}
 	<previous>{{previous}}</previous>
 {% endif %}
