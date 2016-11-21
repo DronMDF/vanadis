@@ -1,7 +1,7 @@
 from django.test import RequestFactory, TestCase
 from base.models import Project
 from ui.views import RevisionView
-from . import FakeRepository
+from . import FakeRepository, FakeFile
 
 
 class RevisionViewUT(RevisionView):
@@ -13,12 +13,14 @@ class RevisionViewUT(RevisionView):
 
 class TestRevisionView(TestCase):
 	def setUp(self):
+		Project.objects.create(name='project')
 		self.factory = RequestFactory()
-		self.view = RevisionViewUT.as_view(repo=FakeRepository('1f8b852', '67c47e6'))
+		files = [FakeFile('readme.md'), FakeFile('ui/views/RevisionView.py')]
+		repo = FakeRepository('1f8b852', '67c47e6', files=files)
+		self.view = RevisionViewUT.as_view(repo=repo)
 
 	def testPageShowPreviousUrl(self):
 		# Given
-		Project.objects.create(name='project')
 		request = self.factory.get('/project/67c47e6')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6')
@@ -28,7 +30,6 @@ class TestRevisionView(TestCase):
 
 	def testNotHeadRevisionShowPreviousUrl(self):
 		# Given
-		Project.objects.create(name='project')
 		request = self.factory.get('/project/67c47e6')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6')
@@ -38,7 +39,6 @@ class TestRevisionView(TestCase):
 
 	def testXmlReturned(self):
 		# Given
-		Project.objects.create(name='project')
 		request = self.factory.get('/project/67c47e6')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6')
@@ -46,3 +46,14 @@ class TestRevisionView(TestCase):
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
 		self.assertIn('<?xml version="1.0" encoding="UTF-8"?>', content)
+
+	def testXmlFilelist(self):
+		# Given
+		request = self.factory.get('/project/67c47e6')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<path>readme.md</path>', content)
+		self.assertIn('<path>ui/views/RevisionView.py</path>', content)

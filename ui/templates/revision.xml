@@ -10,7 +10,7 @@
 {% for file in files %}
 	<file>
 		<oid>{{file.oid}}</oid>
-		<name>{{file.name}}</name>
+		<path>{{file.path}}</path>
 		<issue_count>{{file.issue_count}}</issue_count>
 	</file>
 {% endfor %}

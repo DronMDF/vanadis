@@ -14,8 +14,9 @@
 	<p/>
 	Files:<br/>
 	<xsl:for-each select="file">
-		<a href='/{project_name}/{name}'><xsl:value-of select="name"/></a>
-			with <xsl:value-of select="issues_count"/> issues<br/>
+		<xsl:sort select="path"/>
+		<a href='/{/revision/project_name}/{/revision/revision}/{path}'><xsl:value-of select="path"/></a>
+			with <xsl:value-of select="issue_count"/> issues<br/>
 	</xsl:for-each>
 </body>
 </html>
