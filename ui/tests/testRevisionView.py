@@ -35,3 +35,14 @@ class TestRevisionView(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context_data['revision'], '67c47e6')
+
+	def testXmlReturned(self):
+		# Given
+		Project.objects.create(name='project')
+		request = self.factory.get('/project/67c47e6')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<?xml version="1.0" encoding="UTF-8"?>', content)

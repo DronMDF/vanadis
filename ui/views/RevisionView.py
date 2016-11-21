@@ -4,7 +4,7 @@ from ui.views import RepositoryBaseView
 
 
 class RevisionView(RepositoryBaseView):
-	template_name = 'project_revision.html'
+	template_name = 'revision.xml'
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
