@@ -27,6 +27,23 @@ class TestImportView(TestCase):
 		# Then
 		self.assertEqual(len(issue), 1)
 
+	def testMissingProjectCause404(self):
+		# Given
+		request = self.factory.post('/nonexist/import/12345678',
+			content_type='application/xml', data='<files/>')
+		# When
+		with self.assertRaises(Http404):
+			ImportViewUT.as_view()(request, projectname='nonexist', revision='12345678')
+
+	def testMissingRevisionCause404(self):
+		# Given
+		Project.objects.create(name='norev')
+		request = self.factory.post('/norev/import/12345678',
+			content_type='application/xml', data='<files/>')
+		# When
+		with self.assertRaises(Http404):
+			ImportViewUT.as_view()(request, projectname='norev', revision='12345678')
+
 	def testImportSimpleIssues(self):
 		# Given
 		Project.objects.create(name='import1')
@@ -41,12 +58,3 @@ class TestImportView(TestCase):
 		self.assertEqual(issue.file.path, 'xxx.c')
 		self.assertEqual(issue.line, 123)
 		self.assertEqual(issue.text, 'xxx')
-
-	def testMissingRevisionCause404(self):
-		# Given
-		Project.objects.create(name='norev')
-		request = self.factory.post('/norev/import/12345678',
-			content_type='application/xml', data='<files/>')
-		# When
-		with self.assertRaises(Http404):
-			ImportViewUT.as_view()(request, projectname='norev', revision='12345678')
