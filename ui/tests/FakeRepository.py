@@ -10,6 +10,9 @@ class FakeRepository:
 		self.revs = revs
 		self.files = files
 
+	def revparse(self, revision):
+		return revision
+
 	def head(self):
 		return self.revs[-1]
 
