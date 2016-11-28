@@ -15,7 +15,6 @@ class FileView(TemplateView):
 	def generateSourceLine(self, line, issues):
 		return {
 			'line': line,
-			'code': issues[0].code,
 			'issues': self.sortedLineIssue(issues)
 		}
 

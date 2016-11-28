@@ -21,8 +21,7 @@ class ImportView(View):
 		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
 
-		revision = self.getRevision(project, kwargs['revision'])
-
+		self.getRevision(project, kwargs['revision'])
 		it = ElementTree.parse(request)
 		issues = []
 		for f in it.findall('./file'):
@@ -31,7 +30,7 @@ class ImportView(View):
 				issues.append(Issue(project=project, file=file,
 					line=int(i.findtext('./line')),
 					position=int(i.findtext('./position', default=0)),
-					text=i.findtext('./message'), code=hex(revision)))
+					text=i.findtext('./message')))
 		Issue.objects.bulk_create(issues)
 
 		return HttpResponse()

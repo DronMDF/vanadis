@@ -19,8 +19,8 @@ class Object(models.Model):
 
 class Issue(models.Model):
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, db_index=True)
-	file = models.ForeignKey(File, on_delete=models.CASCADE, db_index=True)
+	file = models.ForeignKey(File, on_delete=models.CASCADE, null=True, db_index=True)
+	object = models.ForeignKey(Object, on_delete=models.CASCADE, null=True, db_index=True)
 	line = models.IntegerField()
 	position = models.IntegerField()
 	text = models.CharField(max_length=256)
-	code = models.CharField(max_length=4096)

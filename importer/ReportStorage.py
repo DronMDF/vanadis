@@ -35,15 +35,14 @@ class ReportStorage:
 		files = {f.path: f for f in File.objects.filter(project=self.project)}
 		filemap = dict(self.pathMatchMap(report.files(), files.keys()))
 
-		issues = [(i.file.path, i.line, i.position, i.text, i.code)
+		issues = [(i.file.path, i.line, i.position, i.text)
 				for i in Issue.objects.filter(project=self.project)]
 		newissues = list()
 		for ni in report.issues():
 			filename = filemap[ni.file]
-			if (filename, ni.line, ni.position, ni.message, ni.code) not in issues:
-				issues.append((filename, ni.line, ni.position, ni.message, ni.code))
+			if (filename, ni.line, ni.position, ni.message) not in issues:
+				issues.append((filename, ni.line, ni.position, ni.message))
 				ii = Issue(project=self.project, file=files[filename],
-					line=ni.line, position=ni.position, text=ni.message,
-					code=ni.code)
+					line=ni.line, position=ni.position, text=ni.message)
 				newissues.append(ii)
 		Issue.objects.bulk_create(newissues)
