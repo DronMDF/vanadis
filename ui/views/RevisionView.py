@@ -20,6 +20,6 @@ class RevisionView(RepositoryBaseView):
 		previous = repo.prev()
 		if previous is not None:
 			context['previous'] = previous
-		context['files'] = [{'id': b64encode(f.oid.raw[:6]), 'path': f.path,
+		context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
 			'issue_count': 0} for f in repo.getFiles(revision)]
 		return context

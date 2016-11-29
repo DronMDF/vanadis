@@ -45,8 +45,8 @@ class Repository:
 		for te in tree:
 			filename = str(Path(prefix, te.name))
 			if te.type == 'blob':
-				File = namedtuple('File', ['oid', 'path'])
-				yield File(te.hex[:7], filename)
+				File = namedtuple('File', ['id', 'path'])
+				yield File(te.id, filename)
 			elif te.type == 'tree':
 				yield from self.getTreeFiles(self.repo[te.id], filename)
 
