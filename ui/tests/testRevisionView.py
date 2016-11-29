@@ -15,7 +15,8 @@ class TestRevisionView(TestCase):
 	def setUp(self):
 		Project.objects.create(name='project')
 		self.factory = RequestFactory()
-		files = [FakeFile('readme.md'), FakeFile('ui/views/RevisionView.py')]
+		files = [FakeFile('readme.md', '9c0398b0dbf6'),
+			FakeFile('ui/views/RevisionView.py', 'bfc51f6ed870')]
 		repo = FakeRepository('1f8b852', '67c47e6', files=files)
 		self.view = RevisionViewUT.as_view(repo=repo)
 
@@ -57,3 +58,15 @@ class TestRevisionView(TestCase):
 		content = response.render().content.decode('utf8')
 		self.assertIn('<path>readme.md</path>', content)
 		self.assertIn('<path>ui/views/RevisionView.py</path>', content)
+
+	def testXmlFileOids(self):
+		# Given
+		request = self.factory.get('/project/67c47e6')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		# File id encode to base64 encoding, first 6 bytes.
+		self.assertIn('<id>nAOYsNv2</id>', content)
+		self.assertIn('<id>v8Ufbthw</id>', content)

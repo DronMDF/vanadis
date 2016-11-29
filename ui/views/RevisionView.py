@@ -1,3 +1,4 @@
+from base64 import urlsafe_b64encode as b64encode
 from django.shortcuts import get_object_or_404
 from base.models import Project
 from ui.views import RepositoryBaseView
@@ -19,6 +20,6 @@ class RevisionView(RepositoryBaseView):
 		previous = repo.prev()
 		if previous is not None:
 			context['previous'] = previous
-		context['files'] = [{'oid': f.oid, 'path': f.path, 'issue_count': 0}
-			for f in repo.getFiles(revision)]
+		context['files'] = [{'id': b64encode(f.oid.raw[:6]), 'path': f.path,
+			'issue_count': 0} for f in repo.getFiles(revision)]
 		return context

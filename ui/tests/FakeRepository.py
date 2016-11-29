@@ -1,8 +1,15 @@
+import binascii
+
+
+class FakeOid:
+	def __init__(self, oid):
+		self.raw = binascii.unhexlify(oid)
+
 
 class FakeFile:
-	def __init__(self, path):
+	def __init__(self, path, oid='0123456789012'):
 		self.path = path
-		self.oid = '01234567'
+		self.oid = FakeOid(oid)
 
 
 class FakeRepository:
