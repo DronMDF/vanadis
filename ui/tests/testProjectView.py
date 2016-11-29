@@ -88,7 +88,7 @@ class TestProjectView(TestCase):
 		# Given
 		Project.objects.create(name='last')
 		request = self.factory.get('/last')
-		view = ProjectViewUT.as_view(repo=FakeRepository('67c47e6'))
+		view = ProjectViewUT.as_view(repo=FakeRepository(['67c47e6']))
 		# When
 		response = view(request, projectname='last')
 		# Then

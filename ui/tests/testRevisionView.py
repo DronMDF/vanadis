@@ -13,12 +13,16 @@ class RevisionViewUT(RevisionView):
 
 class TestRevisionView(TestCase):
 	def setUp(self):
-		Project.objects.create(name='project')
-		self.factory = RequestFactory()
-		files = [FakeFile('readme.md', '9c0398b0dbf6'),
-			FakeFile('ui/views/RevisionView.py', 'bfc51f6ed870')]
-		repo = FakeRepository('1f8b852', '67c47e6', files=files)
+		repo = FakeRepository(
+			commits=['1f8b852', '67c47e6'],
+			files=[
+				FakeFile('readme.md', '9c0398b0dbf6'),
+				FakeFile('ui/views/RevisionView.py', 'bfc51f6ed870')
+			]
+		)
 		self.view = RevisionViewUT.as_view(repo=repo)
+		self.factory = RequestFactory()
+		Project.objects.create(name='project')
 
 	def testPageShowPreviousUrl(self):
 		# Given

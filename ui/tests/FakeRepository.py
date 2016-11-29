@@ -13,12 +13,15 @@ class FakeFile:
 
 
 class FakeRepository:
-	def __init__(self, *revs, files=list()):
-		self.revs = revs
-		self.files = files
+	def __init__(self, commits=None, files=None):
+		self.revs = commits if commits is not None else []
+		self.files = files if files is not None else []
 
 	def revparse(self, revision):
-		return revision
+		for r in self.revs:
+			if revision in r:
+				return revision
+		raise KeyError('No revision')
 
 	def head(self):
 		return self.revs[-1]
@@ -26,6 +29,5 @@ class FakeRepository:
 	def prev(self):
 		return self.revs[-2]
 
-	def getFiles(self, revision):
-		del revision
+	def getFiles(self, _):
 		return self.files
