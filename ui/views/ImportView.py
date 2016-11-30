@@ -11,28 +11,28 @@ from . import RepositoryBaseView
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ImportView(RepositoryBaseView):
-	def getRevision(self, project, revision):
+	def getRevision(self, repo, revision):
 		try:
-			repository = self.getRepository(project)
-			return repository.revparse(revision)
+			return repo.revparse(revision)
 		except:
 			raise Http404("Revision not found")
 
-	def getFileId(self, xid):
+	def getFileId(self, repo, xid):
 		if not isinstance(xid, str):
 			raise Http404("File not found")
 		fileid = b64decode(xid)
-		file = self.repo.getFile(hexlify(fileid).decode('ascii'))
+		file = repo.getFile(hexlify(fileid).decode('ascii'))
 		return int.from_bytes(file.id.raw[:8], 'big')
 
 	def post(self, request, **kwargs):
 		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
-		self.getRevision(project, kwargs['revision'])
+		repo = self.getRepository(project)
+		self.getRevision(repo, kwargs['revision'])
 		it = ElementTree.parse(request)
 		issues = []
 		for f in it.findall('./file'):
-			oid = self.getFileId(f.findtext('./id'))
+			oid = self.getFileId(repo, f.findtext('./id'))
 			obj = Object.objects.create(project=project, oid=oid, issues_count=0)
 			for i in f.findall('./issue'):
 				issues.append(Issue(project=project, object=obj,
