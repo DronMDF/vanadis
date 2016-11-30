@@ -22,7 +22,7 @@ class ImportView(RepositoryBaseView):
 			raise Http404("File not found")
 		fileid = b64decode(xid)
 		file = repo.getFile(hexlify(fileid).decode('ascii'))
-		return int.from_bytes(file.id.raw[:8], 'big')
+		return int.from_bytes(file.id.raw[:8], 'big', signed=True)
 
 	def post(self, request, **kwargs):
 		projectname = kwargs['projectname']
@@ -33,7 +33,8 @@ class ImportView(RepositoryBaseView):
 		issues = []
 		for f in it.findall('./file'):
 			oid = self.getFileId(repo, f.findtext('./id'))
-			obj = Object.objects.create(project=project, oid=oid, issues_count=0)
+			obj, _ = Object.objects.update_or_create(project=project, oid=oid,
+				issues_count=0)
 			for i in f.findall('./issue'):
 				issues.append(Issue(project=project, object=obj,
 					line=int(i.findtext('./line')),

@@ -53,3 +53,9 @@ class Repository:
 	def getFiles(self, revision):
 		commit = self.repo.revparse_single(revision)
 		yield from self.getTreeFiles(commit.tree, '')
+
+	def getFile(self, hid):
+		blob = self.repo.revparse_single(hid)
+		if blob.type != 3:
+			return KeyError(hid)
+		return blob
