@@ -45,11 +45,17 @@ class Repository:
 		for te in tree:
 			filename = str(Path(prefix, te.name))
 			if te.type == 'blob':
-				File = namedtuple('File', ['oid', 'path'])
-				yield File(te.hex[:7], filename)
+				File = namedtuple('File', ['id', 'path'])
+				yield File(te.id, filename)
 			elif te.type == 'tree':
 				yield from self.getTreeFiles(self.repo[te.id], filename)
 
 	def getFiles(self, revision):
 		commit = self.repo.revparse_single(revision)
 		yield from self.getTreeFiles(commit.tree, '')
+
+	def getFile(self, hid):
+		blob = self.repo.revparse_single(hid)
+		if blob.type != 3:
+			return KeyError(hid)
+		return blob

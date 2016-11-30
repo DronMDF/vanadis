@@ -9,7 +9,7 @@
 {% endif %}
 {% for file in files %}
 	<file>
-		<oid>{{file.oid}}</oid>
+		<id>{{file.id}}</id>
 		<path>{{file.path}}</path>
 		<issue_count>{{file.issue_count}}</issue_count>
 	</file>

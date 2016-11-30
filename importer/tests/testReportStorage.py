@@ -9,13 +9,11 @@ from importer.ReportStorage import ReportStorage
 
 
 class TestIssue:
-	# pylint: disable=too-many-arguments
-	def __init__(self, file, line=77, position=88, message='Wow', code='nil'):
+	def __init__(self, file, line=77, position=88, message='Wow'):
 		self.file = file
 		self.line = line
 		self.position = position
 		self.message = message
-		self.code = code
 
 
 class TestReport(Report):
@@ -41,10 +39,10 @@ class TestReportStorage(TestCase):
 		project = Project.objects.create(name='test')
 		file = File.objects.create(project=project, path='file1')
 		Issue.objects.create(project=project, file=file, line=10, position=20,
-			text='Error', code='Code')
+			text='Error')
 		storage = ReportStorage(project)
 		report = TestReport([
-			TestIssue('file1', line=10, position=20, message='Error', code='Code'),
+			TestIssue('file1', line=10, position=20, message='Error'),
 			TestIssue('file1', line=20)])
 		# When
 		storage.importReport(report)
