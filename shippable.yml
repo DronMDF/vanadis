@@ -12,12 +12,7 @@ build:
 
   ci:
     - apt-get -y install language-pack-en python3-pip python3-pygit2
-    - pip3 install --upgrade pip
-    - pip3 install coverage
-    - pip3 install Django==1.10
-    - pip3 install pep8
-    - pip3 install pylint
-    - pip3 install unittest-xml-reporting
+    - pip3 install coverage Django==1.10.3 pep8 pylint unittest-xml-reporting
     - ./style.sh
     - ./dbinit.sh
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
@@ -26,7 +21,6 @@ build:
     - docker build -t dronmdf/vanadis:devel . # Build image always, for check
 
   post_ci:
-    - echo $SHIPPABLE_JOB_NUMBER $BRANCH $IS_PULL_REQUEST
     - if [ "$SHIPPABLE_JOB_NUMBER" == 1 -a "$BRANCH" == master -a "$IS_PULL_REQUEST" == false ]; then docker push dronmdf/vanadis:devel; fi
 
 integrations:
