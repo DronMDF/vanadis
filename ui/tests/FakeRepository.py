@@ -19,6 +19,7 @@ class FakeFile:
 
 class FakeTree:
 	def __init__(self, name, *files):
+		self.id = FakeOid('123456789012')
 		self.name = name
 		self.files = files
 
@@ -64,16 +65,16 @@ class FakeRepository:
 	def prev(self):
 		return self.commits[1].revision
 
-	def getTreeFiles(self, tree, prefix):
+	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree.files:
 			filename = str(Path(prefix, te.name))
-			if isinstance(te, FakeFile):
+			if isinstance(te, FakeTree) and recursive:
+				yield from self.getTreeFiles(te, filename, recursive)
+			else:
 				File = namedtuple('File', ['id', 'path'])
 				yield File(te.id, filename)
-			else:
-				yield from self.getTreeFiles(te, filename)
 
-	def getFiles(self, revision):
+	def getFiles(self, revision, recursive):
 		for c in self.commits:
 			if c.revision == revision:
-				yield from self.getTreeFiles(c.tree, '')
+				yield from self.getTreeFiles(c.tree, '', recursive)

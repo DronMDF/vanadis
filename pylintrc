@@ -48,7 +48,7 @@ confidence=
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time. See also the "--disable" option for examples.
-#enable=
+enable=all
 
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifiers separated by comma (,) or put this
@@ -60,7 +60,7 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 disable=missing-docstring,bad-continuation,too-few-public-methods,invalid-name,no-name-in-module,
-	no-self-use,locally-disabled,no-member
+	no-self-use,locally-disabled,no-member,suppressed-message
 
 [REPORTS]
 

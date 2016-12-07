@@ -41,18 +41,18 @@ class Repository:
 		except KeyError:
 			return None
 
-	def getTreeFiles(self, tree, prefix):
+	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree:
 			filename = str(Path(prefix, te.name))
-			if te.type == 'blob':
+			if te.type == 'tree' and recursive:
+				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
+			else:
 				File = namedtuple('File', ['id', 'path'])
 				yield File(te.id, filename)
-			elif te.type == 'tree':
-				yield from self.getTreeFiles(self.repo[te.id], filename)
 
-	def getFiles(self, revision):
+	def getFiles(self, revision, recursive):
 		commit = self.repo.revparse_single(revision)
-		yield from self.getTreeFiles(commit.tree, '')
+		yield from self.getTreeFiles(commit.tree, '', recursive)
 
 	def getFile(self, hid):
 		blob = self.repo.revparse_single(hid)
