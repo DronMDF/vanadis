@@ -48,10 +48,9 @@ class TestRevisionView(TestCase):
 
 	def testXmlFilelist(self):
 		# Given
-		request = self.factory.get('/project/67c47e6?view=full')
+		request = self.factory.get('/project/67c47e6?view=recursive')
 		# When
-		response = self.view(request, projectname='project', revision='67c47e6',
-			view='recursive')
+		response = self.view(request, projectname='project', revision='67c47e6')
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
@@ -71,10 +70,9 @@ class TestRevisionView(TestCase):
 
 	def testXmlFileOids(self):
 		# Given
-		request = self.factory.get('/project/67c47e6')
+		request = self.factory.get('/project/67c47e6?view=recursive')
 		# When
-		response = self.view(request, projectname='project', revision='67c47e6',
-			view='recursive')
+		response = self.view(request, projectname='project', revision='67c47e6')
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
