@@ -22,5 +22,6 @@ class RevisionView(RepositoryBaseView):
 			context['previous'] = previous
 		recursive = (kwargs.get('view', 'onelevel') == 'recursive')
 		context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
-			'issue_count': 0} for f in repo.getFiles(revision, recursive)]
+			'name': f.path if recursive else f.name, 'issue_count': 0}
+				for f in repo.getFiles(revision, recursive)]
 		return context

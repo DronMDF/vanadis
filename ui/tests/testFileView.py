@@ -55,4 +55,4 @@ class TestFileView(TestCase):
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
 		self.assertIn('<base_path>ui</base_path>', content)
-		self.assertIn('<path>views</path>', content)
+		self.assertIn('<name>views</name>', content)

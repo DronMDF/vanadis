@@ -55,8 +55,8 @@ class TestRevisionView(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
-		self.assertIn('<path>readme.md</path>', content)
-		self.assertIn('<path>ui/views/RevisionView.py</path>', content)
+		self.assertIn('<name>readme.md</name>', content)
+		self.assertIn('<name>ui/views/RevisionView.py</name>', content)
 
 	def testXmlFilelistNotRecursive(self):
 		# Given
@@ -66,8 +66,8 @@ class TestRevisionView(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
-		self.assertIn('<path>readme.md</path>', content)
-		self.assertIn('<path>ui</path>', content)
+		self.assertIn('<name>readme.md</name>', content)
+		self.assertIn('<name>ui</name>', content)
 
 	def testXmlFileOids(self):
 		# Given

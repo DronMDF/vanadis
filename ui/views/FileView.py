@@ -47,8 +47,8 @@ class FileView(RepositoryBaseView):
 			if previous is not None:
 				context['previous'] = previous
 			context['base_path'] = filename
-			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.name,
-				'issue_count': 0} for f in self.filterFiles(
+			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
+				'name': f.name, 'issue_count': 0} for f in self.filterFiles(
 					repo.getFiles(revision, True), filename)]
 		else:
 			issues = Issue.objects.filter(project=project,
