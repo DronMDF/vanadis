@@ -30,7 +30,7 @@ class FileView(RepositoryBaseView):
 		}
 
 	def filterFiles(self, files, path):
-		yield from (f for f in files if f.path.startswith(path))
+		yield from (f for f in files if path + '/' + f.name == f.path)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -41,13 +41,15 @@ class FileView(RepositoryBaseView):
 		repo = self.getRepository(project, revision)
 		obj = repo.getObjectByPath(revision, filename)
 		if obj.is_dir():
+			context['projectname'] = projectname
 			context['revision'] = repo.head()
 			previous = repo.prev()
 			if previous is not None:
 				context['previous'] = previous
-			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
+			context['base_path'] = filename
+			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.name,
 				'issue_count': 0} for f in self.filterFiles(
-					repo.getFiles(revision), filename)]
+					repo.getFiles(revision, True), filename)]
 		else:
 			issues = Issue.objects.filter(project=project,
 				file__path=filename).order_by('line')

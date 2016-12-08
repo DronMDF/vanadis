@@ -44,3 +44,15 @@ class TestFileView(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context_data['previous'], '1f8b852')
+
+	def testDirectoryViewEntry(self):
+		# Given
+		request = self.factory.get('/project/67c47e6/ui')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6',
+				filename='ui')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<base_path>ui</base_path>', content)
+		self.assertIn('<path>views</path>', content)

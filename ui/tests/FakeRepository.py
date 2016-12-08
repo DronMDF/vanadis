@@ -74,11 +74,10 @@ class FakeRepository:
 	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree.files:
 			filename = str(Path(prefix, te.name))
+			File = namedtuple('File', ['id', 'path', 'name'])
+			yield File(te.id, filename, te.name)
 			if isinstance(te, FakeTree) and recursive:
 				yield from self.getTreeFiles(te, filename, recursive)
-			else:
-				File = namedtuple('File', ['id', 'path'])
-				yield File(te.id, filename)
 
 	def getFiles(self, revision, recursive=False):
 		for c in self.commits:

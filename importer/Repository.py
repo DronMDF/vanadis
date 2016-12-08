@@ -53,11 +53,10 @@ class Repository:
 	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree:
 			filename = str(Path(prefix, te.name))
+			File = namedtuple('File', ['id', 'path', 'name'])
+			yield File(te.id, filename, te.name)
 			if te.type == 'tree' and recursive:
 				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
-			else:
-				File = namedtuple('File', ['id', 'path'])
-				yield File(te.id, filename)
 
 	def getFiles(self, revision, recursive=False):
 		commit = self.repo.revparse_single(revision)
