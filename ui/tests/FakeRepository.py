@@ -16,12 +16,18 @@ class FakeFile:
 		self.name = name
 		self.id = FakeOid(oid)
 
+	def is_dir(self):
+		return False
+
 
 class FakeTree:
 	def __init__(self, name, *files):
 		self.id = FakeOid('123456789012')
 		self.name = name
 		self.files = files
+
+	def is_dir(self):
+		return True
 
 
 class FakeCommit:
@@ -74,7 +80,33 @@ class FakeRepository:
 				File = namedtuple('File', ['id', 'path'])
 				yield File(te.id, filename)
 
-	def getFiles(self, revision, recursive):
+	def getFiles(self, revision, recursive=False):
 		for c in self.commits:
 			if c.revision == revision:
 				yield from self.getTreeFiles(c.tree, '', recursive)
+
+	def getObjectByTreePath(self, tree, prefix, path):
+		for te in tree.files:
+			filename = str(Path(prefix, te.name))
+			if path == filename:
+				return te
+			if isinstance(te, FakeTree) and path.startswith(filename + '/'):
+				return self.getObjectIdByPath(te, filename, path)
+		raise KeyError(prefix)
+
+	def getObjectByPath(self, revision, path):
+		for c in self.commits:
+			if str(c.revision).startswith(revision):
+				return self.getObjectByTreePath(c.tree, '', path)
+		raise KeyError(revision + '/' + path)
+
+
+class PredefinedFakeRepository(FakeRepository):
+	def __init__(self):
+		super().__init__(
+			FakeCommit('67c47e6', FakeTree(None,
+				FakeFile('readme.md', '9c0398b0dbf6'),
+				FakeTree('ui',
+					FakeTree('views',
+						FakeFile('RevisionView.py', 'bfc51f6ed870'))))),
+			FakeCommit('1f8b852', FakeTree(None)))

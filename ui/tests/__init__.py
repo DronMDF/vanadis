@@ -1,1 +1,1 @@
-from .FakeRepository import FakeFile, FakeTree, FakeCommit, FakeRepository
+from .FakeRepository import FakeFile, FakeTree, FakeCommit, FakeRepository, PredefinedFakeRepository

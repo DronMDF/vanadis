@@ -3,6 +3,15 @@ from pathlib import Path
 import pygit2
 
 
+class RepositoryObjectWrapper:
+	def __init__(self, obj):
+		self.id = obj.id
+		self.obj = obj
+
+	def is_dir(self):
+		return self.obj.type == 2
+
+
 class Repository:
 	def __init__(self, project, revision=None):
 		if project.repo_url is None:
@@ -50,7 +59,7 @@ class Repository:
 				File = namedtuple('File', ['id', 'path'])
 				yield File(te.id, filename)
 
-	def getFiles(self, revision, recursive):
+	def getFiles(self, revision, recursive=False):
 		commit = self.repo.revparse_single(revision)
 		yield from self.getTreeFiles(commit.tree, '', recursive)
 
@@ -59,3 +68,16 @@ class Repository:
 		if blob.type != 3:
 			return KeyError(hid)
 		return blob
+
+	def getObjectByTreePath(self, tree, prefix, path):
+		for te in tree:
+			filename = str(Path(prefix, te.name))
+			if path == filename:
+				return RepositoryObjectWrapper(self.repo[te.id])
+			if te.type == 'tree' and path.startswith(filename + '/'):
+				return self.getObjectByTreePath(self.repo[te.id], filename, path)
+		raise KeyError(prefix)
+
+	def getObjectByPath(self, revision, path):
+		commit = self.repo.revparse_single(revision)
+		return self.getObjectByTreePath(commit.tree, '', path)

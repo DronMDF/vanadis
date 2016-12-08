@@ -1,7 +1,7 @@
 from django.test import RequestFactory, TestCase
 from base.models import Project
 from ui.views import RevisionView
-from . import FakeCommit, FakeFile, FakeRepository, FakeTree
+from . import PredefinedFakeRepository
 
 
 class RevisionViewUT(RevisionView):
@@ -13,13 +13,7 @@ class RevisionViewUT(RevisionView):
 
 class TestRevisionView(TestCase):
 	def setUp(self):
-		repo = FakeRepository(
-			FakeCommit('67c47e6', FakeTree(None,
-				FakeFile('readme.md', '9c0398b0dbf6'),
-				FakeTree('ui',
-					FakeTree('views',
-						FakeFile('RevisionView.py', 'bfc51f6ed870'))))),
-			FakeCommit('1f8b852', FakeTree(None)))
+		repo = PredefinedFakeRepository()
 		self.view = RevisionViewUT.as_view(repo=repo)
 		self.factory = RequestFactory()
 		Project.objects.create(name='project')

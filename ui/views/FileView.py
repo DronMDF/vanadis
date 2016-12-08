@@ -1,10 +1,21 @@
+from base64 import urlsafe_b64encode as b64encode
 from itertools import groupby
-from django.views.generic import TemplateView
-from base.models import Issue
+from django.shortcuts import get_object_or_404
+from base.models import Issue, Project
+from ui.views import RepositoryBaseView
 
 
-class FileView(TemplateView):
-	template_name = 'file.html'
+class FileView(RepositoryBaseView):
+	content_type = 'text/xml'
+
+	def get_template_names(self):
+		projectname = self.kwargs['projectname']
+		project = get_object_or_404(Project, name=projectname)
+		revision = self.kwargs['revision']
+		filename = self.kwargs['filename']
+		repo = self.getRepository(project, revision)
+		obj = repo.getObjectByPath(revision, filename)
+		return 'revision.xml' if obj.is_dir() else 'file.html'
 
 	def sortedLineIssue(self, issues):
 		return [{
@@ -18,14 +29,30 @@ class FileView(TemplateView):
 			'issues': self.sortedLineIssue(issues)
 		}
 
+	def filterFiles(self, files, path):
+		yield from (f for f in files if f.path.startswith(path))
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
+		project = get_object_or_404(Project, name=projectname)
+		revision = kwargs['revision']
 		filename = kwargs['filename']
-		issues = Issue.objects.filter(project__name=projectname,
-			file__path=filename).order_by('line')
-		lines = groupby(issues, lambda i: i.line)
-		context['projectname'] = projectname
-		context['filename'] = filename
-		context['sourcecode'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
+		repo = self.getRepository(project, revision)
+		obj = repo.getObjectByPath(revision, filename)
+		if obj.is_dir():
+			context['revision'] = repo.head()
+			previous = repo.prev()
+			if previous is not None:
+				context['previous'] = previous
+			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
+				'issue_count': 0} for f in self.filterFiles(
+					repo.getFiles(revision), filename)]
+		else:
+			issues = Issue.objects.filter(project=project,
+				file__path=filename).order_by('line')
+			lines = groupby(issues, lambda i: i.line)
+			context['projectname'] = projectname
+			context['filename'] = filename
+			context['sourcecode'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
 		return context
