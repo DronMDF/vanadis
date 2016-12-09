@@ -13,6 +13,7 @@ class FakeOid:
 
 class FakeFile:
 	type = 'blob'
+
 	def __init__(self, name, oid='0123456789012'):
 		self.name = name
 		self.id = FakeOid(oid)
@@ -20,6 +21,7 @@ class FakeFile:
 
 class FakeTree:
 	type = 'tree'
+
 	def __init__(self, name, *files):
 		self.id = FakeOid('123456789012')
 		self.name = name
