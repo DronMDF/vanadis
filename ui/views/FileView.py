@@ -13,7 +13,7 @@ class FileView(RepositoryBaseView):
 		project = get_object_or_404(Project, name=projectname)
 		revision = self.kwargs['revision']
 		filename = self.kwargs['filename']
-		repo = self.getRepository(project, revision)
+		repo = self.getRepository(project)
 		obj = repo.getObjectByPath(revision, filename)
 		return 'revision.xml' if obj.is_dir() else 'file.html'
 
@@ -38,7 +38,7 @@ class FileView(RepositoryBaseView):
 		project = get_object_or_404(Project, name=projectname)
 		revision = kwargs['revision']
 		filename = kwargs['filename']
-		repo = self.getRepository(project, revision)
+		repo = self.getRepository(project)
 		obj = repo.getObjectByPath(revision, filename)
 		if obj.is_dir():
 			context['projectname'] = projectname

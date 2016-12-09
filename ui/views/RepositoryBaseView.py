@@ -4,8 +4,8 @@ from importer.Repository import Repository
 
 
 class RepositoryBaseView(TemplateView):
-	def getRepository(self, project, revision=None):
+	def getRepository(self, project):
 		try:
-			return Repository(project, revision)
+			return Repository(project)
 		except RuntimeError:
 			raise Http404('Cannot open repository')

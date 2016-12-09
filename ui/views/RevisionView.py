@@ -15,7 +15,7 @@ class RevisionView(RepositoryBaseView):
 		context['project'] = project
 
 		revision = kwargs['revision']
-		repo = self.getRepository(project, revision)
+		repo = self.getRepository(project)
 		context['revision'] = repo.head()
 		previous = repo.prev()
 		if previous is not None:

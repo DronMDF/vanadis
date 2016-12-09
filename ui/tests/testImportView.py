@@ -8,7 +8,7 @@ from ui.tests import FakeCommit, FakeFile, FakeRepository, FakeTree
 class ImportViewUT(ImportView):
 	repo = None
 
-	def getRepository(self, project, revision=None):
+	def getRepository(self, project):
 		return self.repo
 
 
