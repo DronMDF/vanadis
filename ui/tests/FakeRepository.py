@@ -79,7 +79,7 @@ class FakeRepository:
 			if isinstance(te, FakeTree) and recursive:
 				yield from self.getTreeFiles(te, filename, recursive)
 
-	def getFiles(self, revision, recursive=False):
+	def tree(self, revision, recursive=False):
 		for c in self.commits:
 			if c.revision == revision:
 				yield from self.getTreeFiles(c.tree, '', recursive)

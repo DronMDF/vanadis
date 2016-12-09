@@ -51,7 +51,7 @@ class Repository:
 			if te.type == 'tree' and recursive:
 				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
 
-	def getFiles(self, revision, recursive=False):
+	def tree(self, revision, recursive=False):
 		commit = self.repo.revparse_single(revision)
 		yield from self.getTreeFiles(commit.tree, '', recursive)
 

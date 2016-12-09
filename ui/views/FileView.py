@@ -49,7 +49,7 @@ class FileView(RepositoryBaseView):
 			context['base_path'] = filename
 			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
 				'name': f.name, 'issue_count': 0} for f in self.filterFiles(
-					repo.getFiles(revision, True), filename)]
+					repo.tree(revision, True), filename)]
 		else:
 			issues = Issue.objects.filter(project=project,
 				file__path=filename).order_by('line')
