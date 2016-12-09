@@ -65,6 +65,6 @@ class TestImportView(TestCase):
 		self.view(request, projectname='import1', revision='88abd82')
 		# Then
 		issue = Issue.objects.filter(project__name='import1')[0]
-		self.assertEqual(issue.object.oid, 0x1a6bac7b076f3193)
+		self.assertEqual(issue.object.oid, 0x1a6bac7b076f31)
 		self.assertEqual(issue.line, 123)
 		self.assertEqual(issue.text, 'xxx')
