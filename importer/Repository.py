@@ -1,4 +1,4 @@
-from collections import namedtuple
+from base64 import urlsafe_b64encode as b64encode
 from pathlib import Path
 import pygit2
 
@@ -10,6 +10,30 @@ class RepositoryObjectWrapper:
 
 	def is_dir(self):
 		return self.obj.type == 2
+
+
+class RepositoryId:
+	def __init__(self, oid):
+		self.oid = oid
+
+	def base64(self):
+		return b64encode(self.oid.raw[:6])
+
+
+class RepositoryTreeObject:
+	''' This is a tree object (blob or tree) '''
+	def __init__(self, entry, prefix):
+		self.entry = entry
+		self.prefix = prefix
+
+	def id(self):
+		return RepositoryId(self.entry.id)
+
+	def path(self):
+		return str(Path(self.prefix, self.entry.name))
+
+	def name(self):
+		return self.entry.name
 
 
 class Repository:
@@ -46,8 +70,7 @@ class Repository:
 	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree:
 			filename = str(Path(prefix, te.name))
-			File = namedtuple('File', ['id', 'path', 'name'])
-			yield File(te.id, filename, te.name)
+			yield RepositoryTreeObject(te, prefix)
 			if te.type == 'tree' and recursive:
 				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
 

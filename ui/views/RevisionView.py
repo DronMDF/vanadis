@@ -1,4 +1,3 @@
-from base64 import urlsafe_b64encode as b64encode
 from django.shortcuts import get_object_or_404
 from base.models import Project
 from ui.views import RepositoryBaseView
@@ -21,7 +20,7 @@ class RevisionView(RepositoryBaseView):
 		if previous is not None:
 			context['previous'] = previous
 		recursive = (self.request.GET.get('view', 'onelevel') == 'recursive')
-		context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
-			'name': f.path if recursive else f.name, 'issue_count': 0}
-				for f in repo.tree(revision, recursive)]
+		context['files'] = [{'id': f.id().base64(), 'path': f.path(),
+			'name': f.path() if recursive else f.name(),
+			'issue_count': 0} for f in repo.tree(revision, recursive)]
 		return context

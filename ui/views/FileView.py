@@ -1,4 +1,3 @@
-from base64 import urlsafe_b64encode as b64encode
 from itertools import groupby
 from django.shortcuts import get_object_or_404
 from base.models import Issue, Project
@@ -30,7 +29,7 @@ class FileView(RepositoryBaseView):
 		}
 
 	def filterFiles(self, files, path):
-		yield from (f for f in files if path + '/' + f.name == f.path)
+		yield from (f for f in files if path + '/' + f.name() == f.path())
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -47,8 +46,8 @@ class FileView(RepositoryBaseView):
 			if previous is not None:
 				context['previous'] = previous
 			context['base_path'] = filename
-			context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
-				'name': f.name, 'issue_count': 0} for f in self.filterFiles(
+			context['files'] = [{'id': f.id().base64(), 'path': f.path(),
+				'name': f.name(), 'issue_count': 0} for f in self.filterFiles(
 					repo.tree(revision, True), filename)]
 		else:
 			issues = Issue.objects.filter(project=project,

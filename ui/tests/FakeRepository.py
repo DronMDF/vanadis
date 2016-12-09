@@ -1,6 +1,6 @@
 from binascii import hexlify, unhexlify
-from collections import namedtuple
 from pathlib import Path
+from importer import RepositoryTreeObject
 
 
 class FakeOid:
@@ -74,8 +74,7 @@ class FakeRepository:
 	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree.files:
 			filename = str(Path(prefix, te.name))
-			File = namedtuple('File', ['id', 'path', 'name'])
-			yield File(te.id, filename, te.name)
+			yield RepositoryTreeObject(te, prefix)
 			if isinstance(te, FakeTree) and recursive:
 				yield from self.getTreeFiles(te, filename, recursive)
 
