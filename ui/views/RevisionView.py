@@ -1,11 +1,18 @@
 from django.shortcuts import get_object_or_404
 from base.models import Project
+from ui import DirectoryObject
 from ui.views import RepositoryBaseView
 
 
 class RevisionView(RepositoryBaseView):
 	template_name = 'revision.xml'
 	content_type = 'text/xml'
+
+	def getObjects(self, repo, revision, view):
+		if view == 'recursive':
+			return repo.tree(revision, True)
+		else:
+			return DirectoryObject(repo.tree(revision, True))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -19,8 +26,8 @@ class RevisionView(RepositoryBaseView):
 		previous = repo.prev()
 		if previous is not None:
 			context['previous'] = previous
-		recursive = (self.request.GET.get('view', 'onelevel') == 'recursive')
+		view = self.request.GET.get('view', 'onelevel')
+		files = self.getObjects(repo, revision, view)
 		context['files'] = [{'id': f.id().base64(), 'path': f.path(),
-			'name': f.path() if recursive else f.name(),
-			'issue_count': 0} for f in repo.tree(revision, recursive)]
+			'name': f.path(), 'issue_count': 0} for f in files]
 		return context
