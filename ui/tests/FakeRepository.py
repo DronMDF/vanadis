@@ -51,21 +51,21 @@ class FakeRepository:
 	def prev(self):
 		return self.commits[1].revision
 
-	def getTreeFiles(self, tree, prefix, recursive):
+	def getTreeFiles(self, tree, prefix):
 		for te in tree.files:
 			filename = str(Path(prefix, te.name))
 			yield RepositoryTreeObject(te, prefix)
-			if isinstance(te, FakeTree) and recursive:
-				yield from self.getTreeFiles(te, filename, recursive)
+			if isinstance(te, FakeTree):
+				yield from self.getTreeFiles(te, filename)
 
-	def tree(self, revision, recursive=False):
+	def tree(self, revision):
 		for c in self.commits:
 			if c.revision == revision:
-				yield from self.getTreeFiles(c.tree, '', recursive)
+				yield from self.getTreeFiles(c.tree, '')
 
 	def getFile(self, hid):
 		''' TODO: Move to filter '''
-		for f in self.tree(self.commits[0].revision, True):
+		for f in self.tree(self.commits[0].revision):
 			if str(f.id()).startswith(hid):
 				return f
 		raise KeyError(hid)

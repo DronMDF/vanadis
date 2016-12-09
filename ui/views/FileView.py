@@ -14,7 +14,7 @@ class FileView(RepositoryBaseView):
 		revision = self.kwargs['revision']
 		filename = self.kwargs['filename']
 		repo = self.getRepository(project)
-		obj = TreeObject(repo.tree(revision, True), filename)
+		obj = TreeObject(repo.tree(revision), filename)
 		return 'revision.xml' if obj.is_dir() else 'file.html'
 
 	def sortedLineIssue(self, issues):
@@ -36,7 +36,7 @@ class FileView(RepositoryBaseView):
 		revision = kwargs['revision']
 		filename = kwargs['filename']
 		repo = self.getRepository(project)
-		obj = TreeObject(repo.tree(revision, True), filename)
+		obj = TreeObject(repo.tree(revision), filename)
 		if obj.is_dir():
 			context['projectname'] = projectname
 			context['revision'] = repo.head()
@@ -46,7 +46,7 @@ class FileView(RepositoryBaseView):
 			context['base_path'] = filename
 			context['files'] = [{'id': f.id().base64(), 'path': f.path(),
 				'name': f.name(), 'issue_count': 0} for f in DirectoryObject(
-					repo.tree(revision, True), filename)]
+					repo.tree(revision), filename)]
 		else:
 			issues = Issue.objects.filter(project=project,
 				file__path=filename).order_by('line')

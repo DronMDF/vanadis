@@ -10,9 +10,9 @@ class RevisionView(RepositoryBaseView):
 
 	def getObjects(self, repo, revision, view):
 		if view == 'recursive':
-			return repo.tree(revision, True)
+			return repo.tree(revision)
 		else:
-			return DirectoryObject(repo.tree(revision, True))
+			return DirectoryObject(repo.tree(revision))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
