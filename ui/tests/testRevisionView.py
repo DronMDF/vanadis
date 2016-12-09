@@ -1,7 +1,7 @@
 from django.test import RequestFactory, TestCase
 from base.models import Project
 from ui.views import RevisionView
-from . import FakeRepository, FakeFile
+from . import PredefinedFakeRepository
 
 
 class RevisionViewUT(RevisionView):
@@ -13,13 +13,7 @@ class RevisionViewUT(RevisionView):
 
 class TestRevisionView(TestCase):
 	def setUp(self):
-		repo = FakeRepository(
-			commits=['1f8b852', '67c47e6'],
-			files=[
-				FakeFile('readme.md', '9c0398b0dbf6'),
-				FakeFile('ui/views/RevisionView.py', 'bfc51f6ed870')
-			]
-		)
+		repo = PredefinedFakeRepository()
 		self.view = RevisionViewUT.as_view(repo=repo)
 		self.factory = RequestFactory()
 		Project.objects.create(name='project')
@@ -54,18 +48,29 @@ class TestRevisionView(TestCase):
 
 	def testXmlFilelist(self):
 		# Given
+		request = self.factory.get('/project/67c47e6?view=recursive')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<name>readme.md</name>', content)
+		self.assertIn('<name>ui/views/RevisionView.py</name>', content)
+
+	def testXmlFilelistNotRecursive(self):
+		# Given
 		request = self.factory.get('/project/67c47e6')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6')
 		# Then
 		self.assertEqual(response.status_code, 200)
 		content = response.render().content.decode('utf8')
-		self.assertIn('<path>readme.md</path>', content)
-		self.assertIn('<path>ui/views/RevisionView.py</path>', content)
+		self.assertIn('<name>readme.md</name>', content)
+		self.assertIn('<name>ui</name>', content)
 
 	def testXmlFileOids(self):
 		# Given
-		request = self.factory.get('/project/67c47e6')
+		request = self.factory.get('/project/67c47e6?view=recursive')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6')
 		# Then

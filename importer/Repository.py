@@ -3,6 +3,15 @@ from pathlib import Path
 import pygit2
 
 
+class RepositoryObjectWrapper:
+	def __init__(self, obj):
+		self.id = obj.id
+		self.obj = obj
+
+	def is_dir(self):
+		return self.obj.type == 2
+
+
 class Repository:
 	def __init__(self, project, revision=None):
 		if project.repo_url is None:
@@ -41,21 +50,33 @@ class Repository:
 		except KeyError:
 			return None
 
-	def getTreeFiles(self, tree, prefix):
+	def getTreeFiles(self, tree, prefix, recursive):
 		for te in tree:
 			filename = str(Path(prefix, te.name))
-			if te.type == 'blob':
-				File = namedtuple('File', ['id', 'path'])
-				yield File(te.id, filename)
-			elif te.type == 'tree':
-				yield from self.getTreeFiles(self.repo[te.id], filename)
+			File = namedtuple('File', ['id', 'path', 'name'])
+			yield File(te.id, filename, te.name)
+			if te.type == 'tree' and recursive:
+				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
 
-	def getFiles(self, revision):
+	def getFiles(self, revision, recursive=False):
 		commit = self.repo.revparse_single(revision)
-		yield from self.getTreeFiles(commit.tree, '')
+		yield from self.getTreeFiles(commit.tree, '', recursive)
 
 	def getFile(self, hid):
 		blob = self.repo.revparse_single(hid)
 		if blob.type != 3:
 			return KeyError(hid)
 		return blob
+
+	def getObjectByTreePath(self, tree, prefix, path):
+		for te in tree:
+			filename = str(Path(prefix, te.name))
+			if path == filename:
+				return RepositoryObjectWrapper(self.repo[te.id])
+			if te.type == 'tree' and path.startswith(filename + '/'):
+				return self.getObjectByTreePath(self.repo[te.id], filename, path)
+		raise KeyError(prefix)
+
+	def getObjectByPath(self, revision, path):
+		commit = self.repo.revparse_single(revision)
+		return self.getObjectByTreePath(commit.tree, '', path)

@@ -1,7 +1,7 @@
 from django.test import Client, RequestFactory, TestCase
 from base.models import File, Issue, Project
 from ui.views import ProjectView
-from . import FakeRepository
+from . import FakeCommit, FakeRepository, FakeTree
 
 
 class ProjectViewUT(ProjectView):
@@ -88,7 +88,8 @@ class TestProjectView(TestCase):
 		# Given
 		Project.objects.create(name='last')
 		request = self.factory.get('/last')
-		view = ProjectViewUT.as_view(repo=FakeRepository(['67c47e6']))
+		repo = FakeRepository(FakeCommit('67c47e6', FakeTree(None)))
+		view = ProjectViewUT.as_view(repo=repo)
 		# When
 		response = view(request, projectname='last')
 		# Then

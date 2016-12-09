@@ -2,15 +2,18 @@
 {% load static %}
 <?xml-stylesheet type="text/xsl" href="{% static 'revision.xsl' %}"?>
 <revision>
-	<project_name>{{project.name}}</project_name>
+	<project_name>{{projectname}}</project_name>
 	<revision>{{revision}}</revision>
 {% if previous %}
 	<previous>{{previous}}</previous>
 {% endif %}
+{% if base_path %}
+	<base_path>{{base_path}}</base_path>
+{% endif %}
 {% for file in files %}
 	<file>
 		<id>{{file.id}}</id>
-		<path>{{file.path}}</path>
+		<name>{{file.name}}</name>
 		<issue_count>{{file.issue_count}}</issue_count>
 	</file>
 {% endfor %}

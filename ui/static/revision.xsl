@@ -8,15 +8,37 @@
 
 	<p>
 	<xsl:if test="previous">
-		<a href='/{project_name}/{previous}'><xsl:value-of select="previous"/></a>
+		<xsl:choose>
+		<xsl:when test="/revision/base_path">
+			<a href='/{project_name}/{previous}/{base_path}'>
+				<xsl:value-of select="previous"/>
+			</a>
+		</xsl:when>
+		<xsl:otherwise>
+			<a href='/{project_name}/{previous}'>
+				<xsl:value-of select="previous"/>
+			</a>
+		</xsl:otherwise>
+		</xsl:choose>
 	</xsl:if>
 	&#160;<xsl:value-of select="revision"/></p>
 	<p/>
 	Files:<br/>
 	<xsl:for-each select="file">
-		<xsl:sort select="path"/>
-		<a href='/{/revision/project_name}/{/revision/revision}/{path}'><xsl:value-of select="path"/></a>
-			with <xsl:value-of select="issue_count"/> issues<br/>
+		<xsl:sort select="name"/>
+		<xsl:choose>
+		<xsl:when test="/revision/base_path">
+			<a href='/{/revision/project_name}/{/revision/revision}/{/revision/base_path}/{name}'>
+				<xsl:value-of select="name"/>
+			</a>
+		</xsl:when>
+		<xsl:otherwise>
+			<a href='/{/revision/project_name}/{/revision/revision}/{name}'>
+				<xsl:value-of select="name"/>
+			</a>
+		</xsl:otherwise>
+		</xsl:choose>
+		with <xsl:value-of select="issue_count"/> issues<br/>
 	</xsl:for-each>
 </body>
 </html>

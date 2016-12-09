@@ -20,6 +20,8 @@ class RevisionView(RepositoryBaseView):
 		previous = repo.prev()
 		if previous is not None:
 			context['previous'] = previous
+		recursive = (self.request.GET.get('view', 'onelevel') == 'recursive')
 		context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
-			'issue_count': 0} for f in repo.getFiles(revision)]
+			'name': f.path if recursive else f.name, 'issue_count': 0}
+				for f in repo.getFiles(revision, recursive)]
 		return context

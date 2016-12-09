@@ -2,7 +2,7 @@ from django.test import RequestFactory, TestCase
 from django.http.response import Http404
 from base.models import Issue, Project
 from ui.views import ImportView
-from ui.tests import FakeFile, FakeRepository
+from ui.tests import FakeCommit, FakeFile, FakeRepository, FakeTree
 
 
 class ImportViewUT(ImportView):
@@ -15,12 +15,11 @@ class ImportViewUT(ImportView):
 class TestImportView(TestCase):
 	def setUp(self):
 		repository = FakeRepository(
-			commits=['88abd8249ee8'],
-			files=[
+			FakeCommit('88abd8249ee8', FakeTree(None,
 				FakeFile('README', '09f34f78f2bb6ab5'),
-				FakeFile('arch/mips/Makefile', '1a6bac7b076f31934d')
-			]
-		)
+				FakeTree('arch',
+					FakeTree('mips',
+						FakeFile('Makefile', '1a6bac7b076f31934d'))))))
 		self.view = ImportViewUT.as_view(repo=repository)
 		self.factory = RequestFactory()
 
