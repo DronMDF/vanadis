@@ -92,16 +92,3 @@ class Repository:
 		if blob.type != 3:
 			return KeyError(hid)
 		return blob
-
-	def getObjectByTreePath(self, tree, prefix, path):
-		for te in tree:
-			filename = str(Path(prefix, te.name))
-			if path == filename:
-				return RepositoryObjectWrapper(self.repo[te.id])
-			if te.type == 'tree' and path.startswith(filename + '/'):
-				return self.getObjectByTreePath(self.repo[te.id], filename, path)
-		raise KeyError(prefix)
-
-	def getObjectByPath(self, revision, path):
-		commit = self.repo.revparse_single(revision)
-		return self.getObjectByTreePath(commit.tree, '', path)

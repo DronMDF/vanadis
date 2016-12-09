@@ -14,7 +14,7 @@ class FakeOid:
 class FakeFile:
 	type = 'blob'
 
-	def __init__(self, name, oid='0123456789012'):
+	def __init__(self, name, oid='123456789012'):
 		self.name = name
 		self.id = FakeOid(oid)
 
@@ -69,13 +69,6 @@ class FakeRepository:
 			if str(f.id()).startswith(hid):
 				return f
 		raise KeyError(hid)
-
-	def getObjectByPath(self, revision, path):
-		''' TODO: Move to filter '''
-		for f in self.tree(revision, True):
-			if f.path() == path:
-				return f
-		raise KeyError(revision + '/' + path)
 
 
 class PredefinedFakeRepository(FakeRepository):

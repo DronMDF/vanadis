@@ -1,6 +1,7 @@
 from itertools import groupby
 from django.shortcuts import get_object_or_404
 from base.models import Issue, Project
+from ui import TreeObject
 from ui.views import RepositoryBaseView
 
 
@@ -13,7 +14,7 @@ class FileView(RepositoryBaseView):
 		revision = self.kwargs['revision']
 		filename = self.kwargs['filename']
 		repo = self.getRepository(project)
-		obj = repo.getObjectByPath(revision, filename)
+		obj = TreeObject(repo.tree(revision), filename)
 		return 'revision.xml' if obj.is_dir() else 'file.html'
 
 	def sortedLineIssue(self, issues):
@@ -38,7 +39,7 @@ class FileView(RepositoryBaseView):
 		revision = kwargs['revision']
 		filename = kwargs['filename']
 		repo = self.getRepository(project)
-		obj = repo.getObjectByPath(revision, filename)
+		obj = TreeObject(repo.tree(revision), filename)
 		if obj.is_dir():
 			context['projectname'] = projectname
 			context['revision'] = repo.head()
