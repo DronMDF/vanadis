@@ -45,6 +45,22 @@ class RepositoryTreeObject:
 		return self.entry.type == 'tree'
 
 
+class RepositoryTree:
+	def __init__(self, tree, repo):
+		self.tree = tree
+		self.repo = repo
+
+	def getTreeFiles(self, tree, prefix):
+		for te in tree:
+			filename = str(Path(prefix, te.name))
+			yield RepositoryTreeObject(te, prefix)
+			if te.type == 'tree':
+				yield from self.getTreeFiles(self.repo[te.id], filename)
+
+	def __iter__(self):
+		yield from self.getTreeFiles(self.tree, '')
+
+
 class Repository:
 	def __init__(self, project):
 		if project.repo_url is None:
@@ -76,16 +92,9 @@ class Repository:
 		except KeyError:
 			return None
 
-	def getTreeFiles(self, tree, prefix):
-		for te in tree:
-			filename = str(Path(prefix, te.name))
-			yield RepositoryTreeObject(te, prefix)
-			if te.type == 'tree':
-				yield from self.getTreeFiles(self.repo[te.id], filename)
-
 	def tree(self, revision):
 		commit = self.repo.revparse_single(revision)
-		yield from self.getTreeFiles(commit.tree, '')
+		return RepositoryTree(commit.tree, self.repo)
 
 	def getFile(self, hid):
 		blob = self.repo.revparse_single(hid)

@@ -34,6 +34,21 @@ class FakeCommit:
 		self.tree = tree
 
 
+class FakeTreeList:
+	def __init__(self, tree):
+		self.tree = tree
+
+	def getTreeFiles(self, tree, prefix):
+		for te in tree.files:
+			filename = str(Path(prefix, te.name))
+			yield RepositoryTreeObject(te, prefix)
+			if isinstance(te, FakeTree):
+				yield from self.getTreeFiles(te, filename)
+
+	def __iter__(self):
+		yield from self.getTreeFiles(self.tree, '')
+
+
 class FakeRepository:
 	def __init__(self, *commits):
 		''' commits are log ordered (from newest) FakeCommit '''
@@ -51,17 +66,11 @@ class FakeRepository:
 	def prev(self):
 		return self.commits[1].revision
 
-	def getTreeFiles(self, tree, prefix):
-		for te in tree.files:
-			filename = str(Path(prefix, te.name))
-			yield RepositoryTreeObject(te, prefix)
-			if isinstance(te, FakeTree):
-				yield from self.getTreeFiles(te, filename)
-
 	def tree(self, revision):
 		for c in self.commits:
 			if c.revision == revision:
-				yield from self.getTreeFiles(c.tree, '')
+				return FakeTreeList(c.tree)
+		raise KeyError(revision)
 
 	def getFile(self, hid):
 		''' TODO: Move to filter '''
