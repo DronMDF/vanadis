@@ -1,6 +1,6 @@
 from binascii import hexlify, unhexlify
-from collections import namedtuple
 from pathlib import Path
+from importer import RepositoryTreeObject
 
 
 class FakeOid:
@@ -12,28 +12,41 @@ class FakeOid:
 
 
 class FakeFile:
-	def __init__(self, name, oid='0123456789012'):
+	type = 'blob'
+
+	def __init__(self, name, oid='123456789012'):
 		self.name = name
 		self.id = FakeOid(oid)
 
-	def is_dir(self):
-		return False
-
 
 class FakeTree:
+	type = 'tree'
+
 	def __init__(self, name, *files):
 		self.id = FakeOid('123456789012')
 		self.name = name
 		self.files = files
-
-	def is_dir(self):
-		return True
 
 
 class FakeCommit:
 	def __init__(self, revision, tree):
 		self.revision = revision
 		self.tree = tree
+
+
+class FakeTreeList:
+	def __init__(self, tree):
+		self.tree = tree
+
+	def getTreeFiles(self, tree, prefix):
+		for te in tree.files:
+			filename = str(Path(prefix, te.name))
+			yield RepositoryTreeObject(te, prefix)
+			if isinstance(te, FakeTree):
+				yield from self.getTreeFiles(te, filename)
+
+	def __iter__(self):
+		yield from self.getTreeFiles(self.tree, '')
 
 
 class FakeRepository:
@@ -47,57 +60,24 @@ class FakeRepository:
 				return c.revision
 		raise KeyError(revision)
 
-	def findTreeFile(self, tree, hid):
-		for te in tree.files:
-			if isinstance(te, FakeFile):
-				if str(te.id).startswith(hid):
-					return te
-			else:
-				oid = self.findTreeFile(te, hid)
-				if oid is not None:
-					return oid
-		return None
-
-	def getFile(self, hid):
-		for c in self.commits:
-			oid = self.findTreeFile(c.tree, hid)
-			if oid is not None:
-				return oid
-		raise KeyError(hid)
-
 	def head(self):
 		return self.commits[0].revision
 
 	def prev(self):
 		return self.commits[1].revision
 
-	def getTreeFiles(self, tree, prefix, recursive):
-		for te in tree.files:
-			filename = str(Path(prefix, te.name))
-			File = namedtuple('File', ['id', 'path', 'name'])
-			yield File(te.id, filename, te.name)
-			if isinstance(te, FakeTree) and recursive:
-				yield from self.getTreeFiles(te, filename, recursive)
-
-	def getFiles(self, revision, recursive=False):
+	def tree(self, revision):
 		for c in self.commits:
 			if c.revision == revision:
-				yield from self.getTreeFiles(c.tree, '', recursive)
+				return FakeTreeList(c.tree)
+		raise KeyError(revision)
 
-	def getObjectByTreePath(self, tree, prefix, path):
-		for te in tree.files:
-			filename = str(Path(prefix, te.name))
-			if path == filename:
-				return te
-			if isinstance(te, FakeTree) and path.startswith(filename + '/'):
-				return self.getObjectIdByPath(te, filename, path)
-		raise KeyError(prefix)
-
-	def getObjectByPath(self, revision, path):
-		for c in self.commits:
-			if str(c.revision).startswith(revision):
-				return self.getObjectByTreePath(c.tree, '', path)
-		raise KeyError(revision + '/' + path)
+	def getFile(self, hid):
+		''' TODO: Move to filter '''
+		for f in self.tree(self.commits[0].revision):
+			if str(f.id()).startswith(hid):
+				return f
+		raise KeyError(hid)
 
 
 class PredefinedFakeRepository(FakeRepository):

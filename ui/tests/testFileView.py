@@ -7,7 +7,7 @@ from ui.views import FileView
 class FileViewUT(FileView):
 	repo = None
 
-	def getRepository(self, project, revision=None):
+	def getRepository(self, project):
 		return self.repo
 
 

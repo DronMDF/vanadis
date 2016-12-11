@@ -1,4 +1,4 @@
-from collections import namedtuple
+from base64 import urlsafe_b64encode as b64encode
 from pathlib import Path
 import pygit2
 
@@ -12,8 +12,57 @@ class RepositoryObjectWrapper:
 		return self.obj.type == 2
 
 
+class RepositoryId:
+	def __init__(self, oid):
+		self.oid = oid
+
+	def __str__(self):
+		return str(self.oid)
+
+	def base64(self):
+		return b64encode(self.oid.raw[:6])
+
+	def int(self):
+		return int.from_bytes(self.oid.raw[:7], 'big')
+
+
+class RepositoryTreeObject:
+	''' This is a tree object (blob or tree) '''
+	def __init__(self, entry, prefix):
+		self.entry = entry
+		self.prefix = prefix
+
+	def id(self):
+		return RepositoryId(self.entry.id)
+
+	def path(self):
+		return str(Path(self.prefix, self.entry.name))
+
+	def name(self):
+		return self.entry.name
+
+	def is_dir(self):
+		return self.entry.type == 'tree'
+
+
+class RepositoryTree:
+	def __init__(self, tree, repo):
+		self.tree = tree
+		self.repo = repo
+
+	def getTreeFiles(self, tree, prefix):
+		for te in tree:
+			filename = str(Path(prefix, te.name))
+			yield RepositoryTreeObject(te, prefix)
+			if te.type == 'tree':
+				yield from self.getTreeFiles(self.repo[te.id], filename)
+
+	def __iter__(self):
+		yield from self.getTreeFiles(self.tree, '')
+
+
 class Repository:
-	def __init__(self, project, revision=None):
+	def __init__(self, project):
 		if project.repo_url is None:
 			raise RuntimeError('No repository url')
 		try:
@@ -23,15 +72,8 @@ class Repository:
 			else:
 				self.repo = pygit2.clone_repository(project.repo_url, str(path),
 					bare=True)
-			if revision is None or self.repo.get(revision) is None:
-				self.repo.remotes.set_url('origin', project.repo_url)
-				self.repo.remotes['origin'].fetch()
-			if revision is None:
-				self.revision = 'HEAD'
-			elif self.repo.get(revision) is not None:
-				self.revision = revision
-			else:
-				raise RuntimeError('No reivision')
+			self.repo.remotes.set_url('origin', project.repo_url)
+			self.repo.remotes['origin'].fetch()
 		except pygit2.GitError as e:
 			raise RuntimeError('Fetch problem') from e
 
@@ -40,43 +82,22 @@ class Repository:
 		return int.from_bytes(commit.id.raw[:4], 'big')
 
 	def head(self):
-		commit = self.repo.revparse_single(self.revision)
+		commit = self.repo.revparse_single('HEAD')
 		return str(commit.id)[:7]
 
 	def prev(self):
 		try:
-			commit = self.repo.revparse_single(self.revision + '^')
+			commit = self.repo.revparse_single('HEAD^')
 			return str(commit.id)[:7]
 		except KeyError:
 			return None
 
-	def getTreeFiles(self, tree, prefix, recursive):
-		for te in tree:
-			filename = str(Path(prefix, te.name))
-			File = namedtuple('File', ['id', 'path', 'name'])
-			yield File(te.id, filename, te.name)
-			if te.type == 'tree' and recursive:
-				yield from self.getTreeFiles(self.repo[te.id], filename, recursive)
-
-	def getFiles(self, revision, recursive=False):
+	def tree(self, revision):
 		commit = self.repo.revparse_single(revision)
-		yield from self.getTreeFiles(commit.tree, '', recursive)
+		return RepositoryTree(commit.tree, self.repo)
 
 	def getFile(self, hid):
 		blob = self.repo.revparse_single(hid)
 		if blob.type != 3:
 			return KeyError(hid)
 		return blob
-
-	def getObjectByTreePath(self, tree, prefix, path):
-		for te in tree:
-			filename = str(Path(prefix, te.name))
-			if path == filename:
-				return RepositoryObjectWrapper(self.repo[te.id])
-			if te.type == 'tree' and path.startswith(filename + '/'):
-				return self.getObjectByTreePath(self.repo[te.id], filename, path)
-		raise KeyError(prefix)
-
-	def getObjectByPath(self, revision, path):
-		commit = self.repo.revparse_single(revision)
-		return self.getObjectByTreePath(commit.tree, '', path)

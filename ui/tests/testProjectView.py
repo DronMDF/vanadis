@@ -7,7 +7,7 @@ from . import FakeCommit, FakeRepository, FakeTree
 class ProjectViewUT(ProjectView):
 	repo = None
 
-	def getRepository(self, project, revision=None):
+	def getRepository(self, project):
 		return self.repo
 
 

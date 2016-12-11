@@ -22,7 +22,7 @@ class ImportView(RepositoryBaseView):
 			raise Http404("File not found")
 		fileid = b64decode(xid)
 		file = repo.getFile(hexlify(fileid).decode('ascii'))
-		return int.from_bytes(file.id.raw[:8], 'big', signed=True)
+		return file.id().int()
 
 	def post(self, request, **kwargs):
 		projectname = kwargs['projectname']

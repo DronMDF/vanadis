@@ -7,7 +7,7 @@ from . import PredefinedFakeRepository
 class RevisionViewUT(RevisionView):
 	repo = None
 
-	def getRepository(self, project, revision=None):
+	def getRepository(self, project):
 		return self.repo
 
 

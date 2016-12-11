@@ -1,1 +1,1 @@
-from .Repository import Repository
+from .Repository import Repository, RepositoryTreeObject

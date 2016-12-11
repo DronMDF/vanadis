@@ -1,12 +1,18 @@
-from base64 import urlsafe_b64encode as b64encode
 from django.shortcuts import get_object_or_404
 from base.models import Project
+from ui import DirectoryObject
 from ui.views import RepositoryBaseView
 
 
 class RevisionView(RepositoryBaseView):
 	template_name = 'revision.xml'
 	content_type = 'text/xml'
+
+	def getObjects(self, repo, revision, view):
+		if view == 'recursive':
+			return repo.tree(revision)
+		else:
+			return DirectoryObject(repo.tree(revision))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -15,13 +21,13 @@ class RevisionView(RepositoryBaseView):
 		context['project'] = project
 
 		revision = kwargs['revision']
-		repo = self.getRepository(project, revision)
+		repo = self.getRepository(project)
 		context['revision'] = repo.head()
 		previous = repo.prev()
 		if previous is not None:
 			context['previous'] = previous
-		recursive = (self.request.GET.get('view', 'onelevel') == 'recursive')
-		context['files'] = [{'id': b64encode(f.id.raw[:6]), 'path': f.path,
-			'name': f.path if recursive else f.name, 'issue_count': 0}
-				for f in repo.getFiles(revision, recursive)]
+		view = self.request.GET.get('view', 'onelevel')
+		files = self.getObjects(repo, revision, view)
+		context['files'] = [{'id': f.id().base64(), 'path': f.path(),
+			'name': f.path(), 'issue_count': 0} for f in files]
 		return context
