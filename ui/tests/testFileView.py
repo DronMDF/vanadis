@@ -30,8 +30,8 @@ class TestFileView(TestCase):
 		response = self.view(request, projectname='project', revision='67c47e6',
 				filename='readme.md')
 		# Then
-		sc = response.context_data['sourcecode']
-		self.assertEqual(sc[0]['line'], 7)
+		sc = response.context_data['lines']
+		self.assertEqual(sc[0]['lineno'], 7)
 		self.assertEqual(sc[0]['issues'][0]['position'], 10)
 		self.assertEqual(sc[0]['issues'][1]['position'], 5)
 
@@ -56,3 +56,15 @@ class TestFileView(TestCase):
 		content = response.render().content.decode('utf8')
 		self.assertIn('<base_path>ui</base_path>', content)
 		self.assertIn('<name>views</name>', content)
+
+	def testFileViewEntry(self):
+		# Given
+		request = self.factory.get('/project/67c47e6/ui/views/RevisionView.py')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6',
+				filename='ui/views/RevisionView.py')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<revision>67c47e6</revision>', content)
+		self.assertIn('<path>ui/views/RevisionView.py</path>', content)

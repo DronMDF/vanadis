@@ -15,7 +15,7 @@ class FileView(RepositoryBaseView):
 		filename = self.kwargs['filename']
 		repo = self.getRepository(project)
 		obj = TreeObject(repo.tree(revision), filename)
-		return 'revision.xml' if obj.is_dir() else 'file.html'
+		return 'revision.xml' if obj.is_dir() else 'file.xml'
 
 	def sortedLineIssue(self, issues):
 		return [{
@@ -25,7 +25,8 @@ class FileView(RepositoryBaseView):
 
 	def generateSourceLine(self, line, issues):
 		return {
-			'line': line,
+			'lineno': line,
+			'code': '',
 			'issues': self.sortedLineIssue(issues)
 		}
 
@@ -52,6 +53,6 @@ class FileView(RepositoryBaseView):
 				file__path=filename).order_by('line')
 			lines = groupby(issues, lambda i: i.line)
 			context['projectname'] = projectname
-			context['filename'] = filename
-			context['sourcecode'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
+			context['path'] = filename
+			context['lines'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
 		return context
