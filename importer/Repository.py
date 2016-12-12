@@ -28,9 +28,10 @@ class RepositoryId:
 
 class RepositoryTreeObject:
 	''' This is a tree object (blob or tree) '''
-	def __init__(self, entry, prefix):
+	def __init__(self, entry, prefix, repo=None):
 		self.entry = entry
 		self.prefix = prefix
+		self.repo = repo
 
 	def id(self):
 		return RepositoryId(self.entry.id)
@@ -44,6 +45,9 @@ class RepositoryTreeObject:
 	def is_dir(self):
 		return self.entry.type == 'tree'
 
+	def content(self):
+		return self.repo[self.entry.id].data.decode('utf8')
+
 
 class RepositoryTree:
 	def __init__(self, tree, repo):
@@ -53,7 +57,7 @@ class RepositoryTree:
 	def getTreeFiles(self, tree, prefix):
 		for te in tree:
 			filename = str(Path(prefix, te.name))
-			yield RepositoryTreeObject(te, prefix)
+			yield RepositoryTreeObject(te, prefix, self.repo)
 			if te.type == 'tree':
 				yield from self.getTreeFiles(self.repo[te.id], filename)
 

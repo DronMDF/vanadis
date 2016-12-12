@@ -20,20 +20,20 @@ class TestFileView(TestCase):
 
 	def testViewShouldReturnByLineContext(self):
 		# Given
-		xxx = File.objects.create(project=self.project, path='readme.md')
+		xxx = File.objects.create(project=self.project, path='ui/views/RevisionView.py')
 		Issue.objects.create(project=self.project, file=xxx,
-				line=7, position=5, text='All bad')
+				line=2, position=5, text='All bad')
 		Issue.objects.create(project=self.project, file=xxx,
-				line=7, position=10, text='End bad')
-		request = self.factory.get('/project/67c47e6/readme.md')
+				line=2, position=10, text='End bad')
+		request = self.factory.get('/project/67c47e6/ui/views/RevisionView.py')
 		# When
 		response = self.view(request, projectname='project', revision='67c47e6',
-				filename='readme.md')
+				filename='ui/views/RevisionView.py')
 		# Then
 		sc = response.context_data['lines']
-		self.assertEqual(sc[0]['lineno'], 7)
-		self.assertEqual(sc[0]['issues'][0]['position'], 10)
-		self.assertEqual(sc[0]['issues'][1]['position'], 5)
+		self.assertEqual(sc[1]['lineno'], 2)
+		self.assertIn(5, (i['position'] for i in sc[1]['issues']))
+		self.assertIn(10, (i['position'] for i in sc[1]['issues']))
 
 	def testDirectoryView(self):
 		# Given
@@ -68,3 +68,16 @@ class TestFileView(TestCase):
 		content = response.render().content.decode('utf8')
 		self.assertIn('<revision>67c47e6</revision>', content)
 		self.assertIn('<path>ui/views/RevisionView.py</path>', content)
+
+	def testFileViewContent(self):
+		# Given
+		request = self.factory.get('/project/67c47e6/ui/views/RevisionView.py')
+		# When
+		response = self.view(request, projectname='project', revision='67c47e6',
+				filename='ui/views/RevisionView.py')
+		# Then
+		self.assertEqual(response.status_code, 200)
+		content = response.render().content.decode('utf8')
+		self.assertIn('<code>line1</code>', content)
+		self.assertIn('<code>line2</code>', content)
+		self.assertIn('<code>line3</code>', content)
