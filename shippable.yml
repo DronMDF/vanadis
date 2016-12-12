@@ -12,7 +12,7 @@ build:
 
   ci:
     - apt-get -y install language-pack-en python3-pip python3-pygit2
-    - pip3 install coverage Django==1.10.3 pep8 pylint unittest-xml-reporting
+    - pip3 install coverage Django==1.10.4 pep8 pylint unittest-xml-reporting
     - ./style.sh
     - ./dbinit.sh
     - coverage run ./manage.py test --testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner
