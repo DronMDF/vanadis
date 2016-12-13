@@ -1,6 +1,6 @@
 from binascii import hexlify, unhexlify
 from pathlib import Path
-from importer import RepositoryTreeObject
+from ui import RepositoryTreeObject
 
 
 class FakeOid:
