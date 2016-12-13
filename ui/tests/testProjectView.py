@@ -25,16 +25,6 @@ class TestProjectView(TestCase):
 		self.assertEqual(reply.status_code, 200)
 		self.assertIn("href='/setp/settings'", reply.content.decode('utf-8'))
 
-	def testImportUrl(self):
-		# Given
-		Project.objects.all().delete()
-		Project.objects.create(name='imp')
-		# When
-		reply = Client().get('/imp')
-		# Then
-		self.assertEqual(reply.status_code, 200)
-		self.assertIn("href='/imp/import'", reply.content.decode('utf-8'))
-
 	def testProjectPageHoldProjectName(self):
 		# Given
 		name = 'name-of-project'
@@ -44,16 +34,6 @@ class TestProjectView(TestCase):
 		# Then
 		self.assertEqual(response.status_code, 200)
 		self.assertIn(name, response.content.decode('utf-8'))
-
-	def testProjectPageContainReportUploadUrl(self):
-		# Given
-		name = 'name-of-project'
-		Project.objects.create(name=name)
-		# When
-		response = Client().get('/%s' % name)
-		# Then
-		self.assertEqual(response.status_code, 200)
-		self.assertIn('/%s/import' % name, response.content.decode('utf-8'))
 
 	def testProjectPageContainListOfFiles(self):
 		# Given
