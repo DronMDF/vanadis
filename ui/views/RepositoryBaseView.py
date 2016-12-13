@@ -1,6 +1,6 @@
 from django.http import Http404
 from django.views.generic import TemplateView
-from importer.Repository import Repository
+from ui import Repository
 
 
 class RepositoryBaseView(TemplateView):

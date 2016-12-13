@@ -1,6 +1,5 @@
 from django.test import TestCase
-from importer import RepositoryTreeObject
-from ui import TreeObject
+from ui import RepositoryTreeObject, TreeObject
 from ui.tests import FakeTree, FakeFile
 
 
