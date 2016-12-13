@@ -1,4 +1,3 @@
-from itertools import groupby
 from django.shortcuts import get_object_or_404
 from base.models import Issue, Project
 from ui import DirectoryObject, TreeObject
@@ -15,30 +14,29 @@ class FileView(RepositoryBaseView):
 		filename = self.kwargs['filename']
 		repo = self.getRepository(project)
 		obj = TreeObject(repo.tree(revision), filename)
-		return 'revision.xml' if obj.is_dir() else 'file.html'
+		return 'revision.xml' if obj.is_dir() else 'file.xml'
 
-	def sortedLineIssue(self, issues):
-		return [{
-			'position': i.position,
-			'text': i.text
-		} for i in sorted(list(issues), key=lambda i: i.position, reverse=True)]
-
-	def generateSourceLine(self, line, issues):
-		return {
-			'line': line,
-			'issues': self.sortedLineIssue(issues)
-		}
+	def generateLines(self, content, issues):
+		for lineno, line in enumerate(content):
+			yield {
+				'lineno': lineno + 1,
+				'code': line,
+				'issues': [{
+					'position': i.position,
+					'text': i.text
+				} for i in issues if i.line == lineno + 1]
+			}
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
+		context['projectname'] = projectname
 		project = get_object_or_404(Project, name=projectname)
 		revision = kwargs['revision']
 		filename = kwargs['filename']
 		repo = self.getRepository(project)
 		obj = TreeObject(repo.tree(revision), filename)
 		if obj.is_dir():
-			context['projectname'] = projectname
 			context['revision'] = repo.head()
 			previous = repo.prev()
 			if previous is not None:
@@ -48,10 +46,9 @@ class FileView(RepositoryBaseView):
 				'name': f.name(), 'issue_count': 0} for f in DirectoryObject(
 					repo.tree(revision), filename)]
 		else:
-			issues = Issue.objects.filter(project=project,
-				file__path=filename).order_by('line')
-			lines = groupby(issues, lambda i: i.line)
-			context['projectname'] = projectname
-			context['filename'] = filename
-			context['sourcecode'] = [self.generateSourceLine(l, list(ii)) for l, ii in lines]
+			context['path'] = filename
+			content = obj.content().split('\n')
+			issues = list(Issue.objects.filter(project=project,
+				file__path=filename).order_by('line'))
+			context['lines'] = list(self.generateLines(content, issues))
 		return context

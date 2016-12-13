@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% load static %}
+<?xml-stylesheet type="text/xsl" href="{% static 'file.xsl' %}"?>
+<file>
+	<projectname>{{projectname}}</projectname>
+	<revision>{{revision}}</revision>
+{% if previous %}
+	<previous>{{previous}}</previous>
+{% endif %}
+	<path>{{path}}</path>
+{% for line in lines %}
+	<line>
+		<lineno>{{line.lineno}}</lineno>
+		<code>{{line.code}}</code>
+{% for issue in line.issues %}
+		<issue>
+			<position>{{issue.position}}</position>
+			<text>{{issue.text}}</text>
+		</issue>
+{% endfor %}
+	</line>
+{% endfor %}
+</file>

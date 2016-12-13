@@ -14,9 +14,11 @@ class FakeOid:
 class FakeFile:
 	type = 'blob'
 
-	def __init__(self, name, oid='123456789012'):
+	def __init__(self, name, oid='123456789012', content=None):
 		self.name = name
 		self.id = FakeOid(oid)
+		content = list() if content is None else content
+		self.data = '\n'.join(content).encode('utf8')
 
 
 class FakeTree:
@@ -35,13 +37,14 @@ class FakeCommit:
 
 
 class FakeTreeList:
-	def __init__(self, tree):
+	def __init__(self, tree, repo):
 		self.tree = tree
+		self.repo = repo
 
 	def getTreeFiles(self, tree, prefix):
 		for te in tree.files:
 			filename = str(Path(prefix, te.name))
-			yield RepositoryTreeObject(te, prefix)
+			yield RepositoryTreeObject(te, prefix, self.repo)
 			if isinstance(te, FakeTree):
 				yield from self.getTreeFiles(te, filename)
 
@@ -53,6 +56,13 @@ class FakeRepository:
 	def __init__(self, *commits):
 		''' commits are log ordered (from newest) FakeCommit '''
 		self.commits = commits
+
+	def __getitem__(self, oid):
+		for c in self.commits:
+			for f in self.tree(c.revision):
+				if str(f.id()) == str(oid):
+					return f.entry
+		raise KeyError(oid)
 
 	def revparse(self, revision):
 		for c in self.commits:
@@ -69,7 +79,7 @@ class FakeRepository:
 	def tree(self, revision):
 		for c in self.commits:
 			if c.revision == revision:
-				return FakeTreeList(c.tree)
+				return FakeTreeList(c.tree, self)
 		raise KeyError(revision)
 
 	def getFile(self, hid):
@@ -84,8 +94,9 @@ class PredefinedFakeRepository(FakeRepository):
 	def __init__(self):
 		super().__init__(
 			FakeCommit('67c47e6', FakeTree(None,
-				FakeFile('readme.md', '9c0398b0dbf6'),
+				FakeFile('readme.md', oid='9c0398b0dbf6'),
 				FakeTree('ui',
 					FakeTree('views',
-						FakeFile('RevisionView.py', 'bfc51f6ed870'))))),
+						FakeFile('RevisionView.py', oid='bfc51f6ed870',
+							content=['line1', 'line2', 'line3']))))),
 			FakeCommit('1f8b852', FakeTree(None)))
