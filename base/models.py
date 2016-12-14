@@ -6,11 +6,6 @@ class Project(models.Model):
 	repo_url = models.CharField(max_length=256, null=True)
 
 
-class File(models.Model):
-	project = models.ForeignKey(Project, on_delete=models.CASCADE)
-	path = models.CharField(max_length=4096, db_index=True)
-
-
 class Object(models.Model):
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, db_index=True)
 	oid = models.BigIntegerField(db_index=True)
@@ -19,8 +14,7 @@ class Object(models.Model):
 
 class Issue(models.Model):
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, db_index=True)
-	file = models.ForeignKey(File, on_delete=models.CASCADE, null=True, db_index=True)
-	object = models.ForeignKey(Object, on_delete=models.CASCADE, null=True, db_index=True)
+	object = models.ForeignKey(Object, on_delete=models.CASCADE, db_index=True)
 	line = models.IntegerField()
 	position = models.IntegerField()
 	text = models.CharField(max_length=256)
