@@ -30,23 +30,24 @@ class FileView(RepositoryBaseView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
-		context['projectname'] = projectname
 		project = get_object_or_404(Project, name=projectname)
 		revision = kwargs['revision']
 		filename = kwargs['filename']
 		repo = self.getRepository(project)
 		obj = TreeObject(repo.tree(revision), filename)
+
+		context['projectname'] = projectname
+		context['revision'] = repo.head()
+		previous = repo.prev()
+		if previous is not None:
+			context['previous'] = previous
+		context['path'] = filename
+
 		if obj.is_dir():
-			context['revision'] = repo.head()
-			previous = repo.prev()
-			if previous is not None:
-				context['previous'] = previous
-			context['base_path'] = filename
 			context['files'] = [{'id': f.id().base64(), 'path': f.path(),
 				'name': f.name(), 'issue_count': 0} for f in DirectoryObject(
 					repo.tree(revision), filename)]
 		else:
-			context['path'] = filename
 			content = obj.content().split('\n')
 			issues = list(Issue.objects.filter(project=project,
 				object__oid=obj.id().int()))
