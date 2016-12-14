@@ -49,6 +49,6 @@ class FileView(RepositoryBaseView):
 			context['path'] = filename
 			content = obj.content().split('\n')
 			issues = list(Issue.objects.filter(project=project,
-				file__path=filename).order_by('line'))
+				object__oid=obj.id().int()))
 			context['lines'] = list(self.generateLines(content, issues))
 		return context

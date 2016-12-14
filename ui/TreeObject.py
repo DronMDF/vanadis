@@ -3,6 +3,12 @@ class TreeObject:
 		self.tree = tree
 		self.path = path
 
+	def id(self):
+		for o in self.tree:
+			if o.path() == self.path:
+				return o.id()
+		raise KeyError(self.path)
+
 	def is_dir(self):
 		for o in self.tree:
 			if o.path() == self.path:
