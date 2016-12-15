@@ -1,20 +1,18 @@
 from django.shortcuts import get_object_or_404
 from base.models import Issue, Project
-from ui import DirectoryObject, TreeObject
+from ui import DirectoryObject, TreeObjectsWithPathname
 from ui.views import RepositoryBaseView
 
 
 class FileView(RepositoryBaseView):
 	content_type = 'text/xml'
 
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.obj = None
+
 	def get_template_names(self):
-		projectname = self.kwargs['projectname']
-		project = get_object_or_404(Project, name=projectname)
-		revision = self.kwargs['revision']
-		filename = self.kwargs['filename']
-		repo = self.getRepository(project)
-		obj = TreeObject(repo.tree(revision), filename)
-		return 'revision.xml' if obj.is_dir() else 'file.xml'
+		return 'revision.xml' if self.obj.is_dir() else 'file.xml'
 
 	def generateLines(self, content, issues):
 		for lineno, line in enumerate(content):
@@ -30,25 +28,26 @@ class FileView(RepositoryBaseView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		projectname = kwargs['projectname']
-		context['projectname'] = projectname
 		project = get_object_or_404(Project, name=projectname)
 		revision = kwargs['revision']
 		filename = kwargs['filename']
 		repo = self.getRepository(project)
-		obj = TreeObject(repo.tree(revision), filename)
-		if obj.is_dir():
-			context['revision'] = repo.head()
-			previous = repo.prev()
-			if previous is not None:
-				context['previous'] = previous
-			context['base_path'] = filename
+		self.obj = next(iter(TreeObjectsWithPathname(repo.tree(revision), filename)))
+
+		context['projectname'] = projectname
+		context['revision'] = repo.head()
+		previous = repo.prev()
+		if previous is not None:
+			context['previous'] = previous
+		context['path'] = filename
+
+		if self.obj.is_dir():
 			context['files'] = [{'id': f.id().base64(), 'path': f.path(),
 				'name': f.name(), 'issue_count': 0} for f in DirectoryObject(
 					repo.tree(revision), filename)]
 		else:
-			context['path'] = filename
-			content = obj.content().split('\n')
+			content = self.obj.content().split('\n')
 			issues = list(Issue.objects.filter(project=project,
-				object__oid=obj.id().int()))
+				object__oid=self.obj.id().int()))
 			context['lines'] = list(self.generateLines(content, issues))
 		return context

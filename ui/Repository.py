@@ -5,41 +5,47 @@ from ui import RepositoryTree
 
 class Repository:
 	def __init__(self, project):
-		if project.repo_url is None:
-			raise RuntimeError('No repository url')
+		self.name = project.name
+		self.url = project.repo_url
+
+	def openRepository(self):
+		path = str(Path('/var/tmp/vanadis', self.name))
 		try:
-			path = Path('/tmp/repos', project.name)
-			if path.is_dir():
-				self.repo = pygit2.Repository(str(path))
-			else:
-				self.repo = pygit2.clone_repository(project.repo_url, str(path),
-					bare=True)
-			self.repo.remotes.set_url('origin', project.repo_url)
-			self.repo.remotes['origin'].fetch()
+			repo = pygit2.Repository(path)
+		except KeyError:
+			repo = pygit2.clone_repository(self.url, path, bare=True)
+		try:
+			repo.remotes.set_url('origin', self.url)
+			repo.remotes['origin'].fetch()
 		except pygit2.GitError as e:
-			raise RuntimeError('Fetch problem') from e
+			raise RuntimeError('Problem with fetch git repository') from e
+		return repo
+
+	def revparse_single(self, revision):
+		return self.openRepository().revparse_single(revision)
 
 	def revparse(self, rev):
-		commit = self.repo.revparse_single(rev)
+		commit = self.revparse_single(rev)
 		return int.from_bytes(commit.id.raw[:4], 'big')
 
 	def head(self):
-		commit = self.repo.revparse_single('HEAD')
+		commit = self.revparse_single('HEAD')
 		return str(commit.id)[:7]
 
 	def prev(self):
 		try:
-			commit = self.repo.revparse_single('HEAD^')
+			commit = self.revparse_single('HEAD^')
 			return str(commit.id)[:7]
 		except KeyError:
 			return None
 
 	def tree(self, revision):
-		commit = self.repo.revparse_single(revision)
-		return RepositoryTree(commit.tree, self.repo)
+		repo = self.openRepository()
+		commit = repo.revparse_single(revision)
+		return RepositoryTree(commit.tree, repo)
 
 	def getFile(self, hid):
-		blob = self.repo.revparse_single(hid)
+		blob = self.revparse_single(hid)
 		if blob.type != 3:
 			return KeyError(hid)
 		return blob

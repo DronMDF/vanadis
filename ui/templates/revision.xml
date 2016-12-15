@@ -7,8 +7,8 @@
 {% if previous %}
 	<previous>{{previous}}</previous>
 {% endif %}
-{% if base_path %}
-	<base_path>{{base_path}}</base_path>
+{% if path %}
+	<base_path>{{path}}</base_path>
 {% endif %}
 {% for file in files %}
 	<file>
