@@ -36,6 +36,14 @@ class FakeCommit:
 		self.tree = tree
 
 
+class FakeCommitChain:
+	def __init__(self, first_commit, *parents):
+		self.revision = first_commit.revision
+		self.tree = first_commit.tree
+		self.parent_ids = [next((c.revision for c in parents))] if len(parents) > 0 else []
+		self.parents = [FakeCommitChain(*parents)] if len(parents) > 0 else []
+
+
 class FakeTreeList:
 	def __init__(self, tree, repo):
 		self.tree = tree
@@ -55,36 +63,44 @@ class FakeTreeList:
 class FakeRepository:
 	def __init__(self, *commits):
 		''' commits are log ordered (from newest) FakeCommit '''
-		self.commits = commits
+		self._head = FakeCommitChain(*commits)
 
 	def __getitem__(self, oid):
-		for c in self.commits:
+		c = self._head
+		while c is not None:
 			for f in self.tree(c.revision):
 				if str(f.id()) == str(oid):
 					return f.entry
+			c = next(c.parents, None)
 		raise KeyError(oid)
 
 	def revparse(self, revision):
-		for c in self.commits:
+		c = self._head
+		while c is not None:
 			if c.revision.startswith(revision):
 				return c.revision
+			c = next(c.parents, None)
 		raise KeyError(revision)
 
 	def head(self):
-		return self.commits[0].revision
+		return self._head.revision
 
 	def prev(self):
-		return self.commits[1].revision
+		if len(self._head.parents) > 0:
+			return self._head.parents[0].revision
+		return None
 
 	def tree(self, revision):
-		for c in self.commits:
+		c = self._head
+		while c is not None:
 			if c.revision == revision:
 				return FakeTreeList(c.tree, self)
+			c = next(c.parents, None)
 		raise KeyError(revision)
 
 	def getFile(self, hid):
 		''' TODO: Move to filter '''
-		for f in self.tree(self.commits[0].revision):
+		for f in self.tree(self._head.revision):
 			if str(f.id()).startswith(hid):
 				return f
 		raise KeyError(hid)
