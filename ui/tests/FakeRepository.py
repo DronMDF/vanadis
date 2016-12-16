@@ -40,8 +40,12 @@ class FakeCommitChain:
 	def __init__(self, first_commit, *parents):
 		self.revision = first_commit.revision
 		self.tree = first_commit.tree
-		self.parent_ids = [next((c.revision for c in parents))] if len(parents) > 0 else []
-		self.parents = [FakeCommitChain(*parents)] if len(parents) > 0 else []
+		if len(parents) > 0:
+			self.parent_ids = [parents[0].revision]
+			self.parents = [FakeCommitChain(parents[0], *parents[1:])]
+		else:
+			self.parent_ids = []
+			self.parents = []
 
 
 class FakeTreeList:
@@ -63,7 +67,7 @@ class FakeTreeList:
 class FakeRepository:
 	def __init__(self, *commits):
 		''' commits are log ordered (from newest) FakeCommit '''
-		self._head = FakeCommitChain(*commits)
+		self._head = FakeCommitChain(commits[0], *commits[1:])
 
 	def __getitem__(self, oid):
 		c = self._head
