@@ -1,6 +1,6 @@
 from binascii import hexlify, unhexlify
 from pathlib import Path
-from ui import RepositoryTreeObject
+from ui import RepositoryHistory, RepositoryTreeObject
 
 
 class FakeOid:
@@ -32,8 +32,20 @@ class FakeTree:
 
 class FakeCommit:
 	def __init__(self, revision, tree):
-		self.revision = revision
+		self.id = revision
 		self.tree = tree
+
+
+class FakeCommitChain:
+	def __init__(self, first_commit, *parents):
+		self.id = first_commit.id
+		self.tree = first_commit.tree
+		if len(parents) > 0:
+			self.parent_ids = [parents[0].id]
+			self.parents = [FakeCommitChain(parents[0], *parents[1:])]
+		else:
+			self.parent_ids = []
+			self.parents = []
 
 
 class FakeTreeList:
@@ -55,37 +67,46 @@ class FakeTreeList:
 class FakeRepository:
 	def __init__(self, *commits):
 		''' commits are log ordered (from newest) FakeCommit '''
-		self.commits = commits
+		self._head = FakeCommitChain(commits[0], *commits[1:])
 
 	def __getitem__(self, oid):
-		for c in self.commits:
-			for f in self.tree(c.revision):
-				if str(f.id()) == str(oid):
+		c = self._head
+		while c is not None:
+			for f in self.tree(c.id):
+				if str(f.id()) in str(oid):
 					return f.entry
+			c = next(iter(c.parents), None)
 		raise KeyError(oid)
 
 	def revparse(self, revision):
-		for c in self.commits:
-			if c.revision.startswith(revision):
-				return c.revision
+		c = self._head
+		while c is not None:
+			if c.id.startswith(revision):
+				return c.id
+			c = next(iter(c.parents), None)
 		raise KeyError(revision)
 
-	def head(self):
-		return self.commits[0].revision
-
-	def prev(self):
-		return self.commits[1].revision
+	def log(self, revision=None):
+		if revision is None:
+			return RepositoryHistory(self._head)
+		c = self._head
+		while c is not None:
+			if c.id.startswith(revision):
+				return RepositoryHistory(c)
+		raise KeyError(revision)
 
 	def tree(self, revision):
-		for c in self.commits:
-			if c.revision == revision:
+		c = self._head
+		while c is not None:
+			if c.id == revision:
 				return FakeTreeList(c.tree, self)
+			c = next(iter(c.parents), None)
 		raise KeyError(revision)
 
 	def getFile(self, hid):
 		''' TODO: Move to filter '''
-		for f in self.tree(self.commits[0].revision):
-			if str(f.id()).startswith(hid):
+		for f in self.tree(self._head.id):
+			if hid.startswith(str(f.id())):
 				return f
 		raise KeyError(hid)
 

@@ -41,7 +41,7 @@ class TestNewProjectView(TestCase):
 		response = Client().post('/newproject', data={'name': 'test_project'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/test_project')
+		self.assertEqual(response.url, '/test_project/settings')
 		Project.objects.get(name='test_project')		# Not raise
 
 	def testT2IsCorrectProjectName(self):
@@ -49,5 +49,5 @@ class TestNewProjectView(TestCase):
 		response = Client().post('/newproject', data={'name': 't2'})
 		# Then
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response.url, '/t2')
+		self.assertEqual(response.url, '/t2/settings')
 		Project.objects.get(name='t2')		# Not raise

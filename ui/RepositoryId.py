@@ -6,7 +6,7 @@ class RepositoryId:
 		self.oid = oid
 
 	def __str__(self):
-		return str(self.oid)
+		return str(self.oid)[:7]
 
 	def base64(self):
 		return b64encode(self.oid.raw[:6])

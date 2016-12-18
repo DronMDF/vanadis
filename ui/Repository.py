@@ -1,6 +1,6 @@
 from pathlib import Path
 import pygit2
-from ui import RepositoryTree
+from ui import RepositoryHistory, RepositoryTree
 
 
 class Repository:
@@ -13,12 +13,17 @@ class Repository:
 		try:
 			repo = pygit2.Repository(path)
 		except KeyError:
-			repo = pygit2.clone_repository(self.url, path, bare=True)
+			repo = pygit2.init_repository(path, bare=True)
+
+		if 'origin' in (r.name for r in repo.remotes):
+			repo.remotes.delete('origin')
+
 		try:
-			repo.remotes.set_url('origin', self.url)
+			repo.remotes.create('origin', self.url)
 			repo.remotes['origin'].fetch()
 		except pygit2.GitError as e:
 			raise RuntimeError('Problem with fetch git repository') from e
+
 		return repo
 
 	def revparse_single(self, revision):
@@ -28,16 +33,9 @@ class Repository:
 		commit = self.revparse_single(rev)
 		return int.from_bytes(commit.id.raw[:4], 'big')
 
-	def head(self):
-		commit = self.revparse_single('HEAD')
-		return str(commit.id)[:7]
-
-	def prev(self):
-		try:
-			commit = self.revparse_single('HEAD^')
-			return str(commit.id)[:7]
-		except KeyError:
-			return None
+	def log(self, revision=None):
+		return RepositoryHistory(self.revparse_single(
+			revision if revision is not None else 'refs/remotes/origin/master'))
 
 	def tree(self, revision):
 		repo = self.openRepository()
