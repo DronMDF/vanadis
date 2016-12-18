@@ -22,10 +22,10 @@ class RevisionView(RepositoryBaseView):
 
 		revision = kwargs['revision']
 		repo = self.getRepository(project)
-		context['revision'] = repo.head()
-		previous = repo.prev()
-		if previous is not None:
-			context['previous'] = previous
+		log = iter(repo.log(revision))
+		context['revision'] = str(next(log).id())
+		context['previous'] = str(next(log).id())
+
 		view = self.request.GET.get('view', 'onelevel')
 		files = self.getObjects(repo, revision, view)
 		context['files'] = [{'id': f.id().base64(), 'path': f.path(),

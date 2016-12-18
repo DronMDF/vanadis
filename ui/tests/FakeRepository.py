@@ -1,6 +1,6 @@
 from binascii import hexlify, unhexlify
 from pathlib import Path
-from ui import RepositoryTreeObject
+from ui import RepositoryHistory, RepositoryTreeObject
 
 
 class FakeOid:
@@ -86,13 +86,14 @@ class FakeRepository:
 			c = next(iter(c.parents), None)
 		raise KeyError(revision)
 
-	def head(self):
-		return self._head.id
-
-	def prev(self):
-		if len(self._head.parents) > 0:
-			return self._head.parents[0].id
-		return None
+	def log(self, revision=None):
+		if revision is None:
+			return RepositoryHistory(self._head)
+		c = self._head
+		while c is not None:
+			if c.id.startswith(revision):
+				return RepositoryHistory(c)
+		raise KeyError(revision)
 
 	def tree(self, revision):
 		c = self._head

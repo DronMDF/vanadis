@@ -1,6 +1,6 @@
 from pathlib import Path
 import pygit2
-from ui import RepositoryTree
+from ui import RepositoryHistory, RepositoryTree
 
 
 class Repository:
@@ -33,16 +33,9 @@ class Repository:
 		commit = self.revparse_single(rev)
 		return int.from_bytes(commit.id.raw[:4], 'big')
 
-	def head(self):
-		commit = self.revparse_single('HEAD')
-		return str(commit.id)[:7]
-
-	def prev(self):
-		try:
-			commit = self.revparse_single('HEAD^')
-			return str(commit.id)[:7]
-		except KeyError:
-			return None
+	def log(self, revision=None):
+		return RepositoryHistory(self.revparse_single(
+			revision if revision is not None else 'refs/remotes/origin/master'))
 
 	def tree(self, revision):
 		repo = self.openRepository()

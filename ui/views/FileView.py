@@ -35,10 +35,9 @@ class FileView(RepositoryBaseView):
 		self.obj = next(iter(TreeObjectsWithPathname(repo.tree(revision), filename)))
 
 		context['projectname'] = projectname
-		context['revision'] = repo.head()
-		previous = repo.prev()
-		if previous is not None:
-			context['previous'] = previous
+		log = iter(repo.log(revision))
+		context['revision'] = str(next(log).id())
+		context['previous'] = str(next(log).id())
 		context['path'] = filename
 
 		if self.obj.is_dir():

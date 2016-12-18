@@ -8,4 +8,5 @@ class ProjectView(RepositoryBaseView):
 		projectname = kwargs['projectname']
 		project = get_object_or_404(Project, name=projectname)
 		repo = self.getRepository(project)
-		return redirect('/%s/%s' % (project.name, repo.head()))
+		log = iter(repo.log())
+		return redirect('/%s/%s' % (project.name, str(next(log).id())))
