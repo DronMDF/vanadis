@@ -13,12 +13,17 @@ class Repository:
 		try:
 			repo = pygit2.Repository(path)
 		except KeyError:
-			repo = pygit2.clone_repository(self.url, path, bare=True)
+			repo = pygit2.init_repository(path, bare=True)
+
+		if 'origin' in (r.name for r in repo.remotes):
+			repo.remotes.delete('origin')
+
 		try:
-			repo.remotes.set_url('origin', self.url)
+			repo.remotes.create('origin', self.url)
 			repo.remotes['origin'].fetch()
 		except pygit2.GitError as e:
 			raise RuntimeError('Problem with fetch git repository') from e
+
 		return repo
 
 	def revparse_single(self, revision):

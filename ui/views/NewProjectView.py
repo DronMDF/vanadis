@@ -25,4 +25,4 @@ class NewProjectView(FormView):		# pylint: disable=too-many-ancestors
 
 	def form_valid(self, form):
 		project = form.save()
-		return redirect('/%s' % project.name)
+		return redirect('/%s/settings' % project.name)
