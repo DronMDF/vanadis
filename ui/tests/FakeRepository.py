@@ -73,9 +73,9 @@ class FakeRepository:
 		c = self._head
 		while c is not None:
 			for f in self.tree(c.id):
-				if str(f.id()) == str(oid):
+				if str(f.id()) in str(oid):
 					return f.entry
-			c = next(c.parents, None)
+			c = next(iter(c.parents), None)
 		raise KeyError(oid)
 
 	def revparse(self, revision):
@@ -83,7 +83,7 @@ class FakeRepository:
 		while c is not None:
 			if c.id.startswith(revision):
 				return c.id
-			c = next(c.parents, None)
+			c = next(iter(c.parents), None)
 		raise KeyError(revision)
 
 	def head(self):
@@ -99,13 +99,13 @@ class FakeRepository:
 		while c is not None:
 			if c.id == revision:
 				return FakeTreeList(c.tree, self)
-			c = next(c.parents, None)
+			c = next(iter(c.parents), None)
 		raise KeyError(revision)
 
 	def getFile(self, hid):
 		''' TODO: Move to filter '''
 		for f in self.tree(self._head.id):
-			if str(f.id()).startswith(hid):
+			if hid.startswith(str(f.id())):
 				return f
 		raise KeyError(hid)
 
