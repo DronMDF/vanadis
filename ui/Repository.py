@@ -1,6 +1,6 @@
 from pathlib import Path
 import pygit2
-from ui import RepositoryHistory, RepositoryTree
+from ui import RepositoryHistory, RepositoryTree, RepositoryTreeObject
 
 
 class Repository:
@@ -46,4 +46,4 @@ class Repository:
 		blob = self.revparse_single(hid)
 		if blob.type != 3:
 			return KeyError(hid)
-		return blob
+		return RepositoryTreeObject(blob, None)
