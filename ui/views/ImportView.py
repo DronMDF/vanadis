@@ -36,10 +36,15 @@ class ImportView(RepositoryBaseView):
 			obj, _ = Object.objects.update_or_create(project=project, oid=oid,
 				issues_count=0)
 			for i in f.findall('./issue'):
-				issues.append(Issue(project=project, object=obj,
-					line=int(i.findtext('./line')),
-					position=int(i.findtext('./position', default=0)),
-					text=i.findtext('./message')))
+				query = {
+					'project': project,
+					'object': obj,
+					'line': int(i.findtext('./line')),
+					'position': int(i.findtext('./position', default=0)),
+					'text': i.findtext('./message')
+				}
+				if not Issue.objects.filter(**query).exists():
+					issues.append(Issue(**query))
 		Issue.objects.bulk_create(issues)
 
 		return HttpResponse()
