@@ -81,3 +81,21 @@ class TestImportView(TestCase):
 		iss = Issue.objects.filter(project=project, object=obj, line=123, position=321,
 				text="blablabla")
 		self.assertEqual(iss.count(), 1)
+
+	def testDeduplicationIssueInInputStream(self):
+		# Given
+		project = Project.objects.create(name='dedup')
+		self.addCleanup(project.delete)
+		request_body = ('<files><file><id>v8Ufbthw</id>'
+					'<issue><line>123</line><position>321</position>'
+						'<message>blablabla</message></issue>'
+					'<issue><line>123</line><position>321</position>'
+						'<message>blablabla</message></issue>'
+				'</file></files>')
+		request = self.factory.post('/dedup/import/67c47e6',
+				content_type='application/xml', data=request_body)
+		# When
+		self.view(request, projectname='dedup', revision='67c47e6')
+		# Then
+		iss = Issue.objects.filter(project=project)
+		self.assertEqual(iss.count(), 1)
