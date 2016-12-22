@@ -7,3 +7,4 @@ from .ProjectView import ProjectView
 from .ProjectSettingView import ProjectSettingView
 from .RevisionView import RevisionView
 from .ImportView import ImportView
+from .IssuesView import IssuesView
